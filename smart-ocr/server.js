@@ -12,8 +12,7 @@ const SILICONFLOW_API_KEY = process.env.SILICONFLOW_API_KEY;
 const ZHIPU_BASE_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 const SILICONFLOW_BASE_URL = 'https://api.siliconflow.cn/v1/chat/completions';
 
-// 降级链：按优先级排序
-// 注意：glm-4v-flash 不支持 Base64，会被跳过（除非有图片URL）
+// 降级链：按优先级排序（全部免费模型）
 const MODEL_CHAIN = [
     { platform: 'zhipu', model: 'glm-4.6v-flash', supportsBase64: true, needsMaxTokens: false },
     { platform: 'zhipu', model: 'glm-4.1v-thinking-flash', supportsBase64: true, needsMaxTokens: false },
@@ -24,6 +23,9 @@ app.use(cors());
 app.use(express.json({ limit: '30mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// =========================================================
+// 健康检查
+// =========================================================
 app.get('/api/health', (req, res) => {
     res.json({
         ok: true,
@@ -32,10 +34,12 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-async function callModel(config, base64Data, prompt) {
+// =========================================================
+// 调用单个视觉模型
+// =========================================================
+async function callVisionModel(config, base64Data, prompt) {
     const { platform, model, needsMaxTokens } = config;
 
-    // 根据平台选择 API Key 和 Endpoint
     let apiKey, apiUrl;
     if (platform === 'zhipu') {
         apiKey = ZHIPU_API_KEY;
@@ -49,7 +53,6 @@ async function callModel(config, base64Data, prompt) {
         throw new Error(`平台 ${platform} 未配置 API Key`);
     }
 
-    // 构造请求体
     const requestBody = {
         model: model,
         messages: [{
@@ -61,8 +64,6 @@ async function callModel(config, base64Data, prompt) {
         }]
     };
 
-    // 根据模型特性决定是否添加 max_tokens
-    // glm-4.6v-flash 和 glm-4.1v-thinking-flash 可以传，但要注意 glm-4v-flash 的 1024 限制
     if (needsMaxTokens) {
         requestBody.max_tokens = 2048;
     }
@@ -93,6 +94,9 @@ async function callModel(config, base64Data, prompt) {
     };
 }
 
+// =========================================================
+// OCR 代理接口（带模型自动降级）
+// =========================================================
 app.post('/api/ocr', async (req, res) => {
     if (!ZHIPU_API_KEY && !SILICONFLOW_API_KEY) {
         return res.status(500).json({ error: '服务器未配置任何平台的 API Key' });
@@ -105,7 +109,6 @@ app.post('/api/ocr', async (req, res) => {
 
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
-    // 强制直接输出，减少响应时间
     const prompt = mode === 'structured'
         ? `直接输出以下 JSON，不要解释、不要 markdown 代码块，只输出一行 JSON：
 {"活动名称":"","时间":"","地点":"","主办单位":"","参与人员":"","全文":""}`
@@ -114,13 +117,9 @@ app.post('/api/ocr', async (req, res) => {
     let lastError = null;
     for (const config of MODEL_CHAIN) {
         try {
-            // 跳过不支持的模型
-            if (!config.supportsBase64) {
-                continue;
-            }
-
+            if (!config.supportsBase64) continue;
             console.log(`尝试: [${config.platform}] ${config.model}`);
-            const result = await callModel(config, base64Data, prompt);
+            const result = await callVisionModel(config, base64Data, prompt);
             console.log(`成功: [${result.platform}] ${result.model}`);
             return res.json({
                 text: result.text,
@@ -132,26 +131,22 @@ app.post('/api/ocr', async (req, res) => {
             lastError = err;
             console.warn(`失败: ${err.message}`);
 
-            // 400 参数错误、429 限流、5xx 服务端错误 → 都继续降级
             if (err.status === 400 || err.status === 429 || err.status >= 500) {
                 continue;
             }
 
-            // 401/403 Key 问题 → 如果是当前平台唯一的 Key，停止；否则继续尝试其他平台
             if (err.status === 401 || err.status === 403) {
-                // 检查是否还有其他平台的 Key 可用
-                const hasOtherPlatform = MODEL_CHAIN.some(c => 
-                    c.platform !== config.platform && 
-                    c.supportsBase64 && 
+                const hasOther = MODEL_CHAIN.some(c =>
+                    c.platform !== config.platform &&
+                    c.supportsBase64 &&
                     ((c.platform === 'zhipu' && ZHIPU_API_KEY) || (c.platform === 'siliconflow' && SILICONFLOW_API_KEY))
                 );
-                if (!hasOtherPlatform) {
+                if (!hasOther) {
                     return res.status(err.status).json({ error: `API Key 无效（${err.status}）`, detail: err.detail });
                 }
                 continue;
             }
 
-            // 其他未知错误 → 停止降级，避免死循环
             return res.status(err.status || 500).json({
                 error: `[${config.platform}] ${config.model} 调用失败（${err.status}）`,
                 detail: err.detail
@@ -159,11 +154,97 @@ app.post('/api/ocr', async (req, res) => {
         }
     }
 
-    // 所有模型都失败
     return res.status(503).json({
-        error: '所有免费视觉模型均不可用，请稍后重试或检查 API Key 配置',
+        error: '所有免费视觉模型均不可用，请稍后重试',
         detail: lastError?.detail
     });
+});
+
+// =========================================================
+// AI 分类接口（供前端"自定义维度"使用）
+// =========================================================
+app.post('/api/classify', async (req, res) => {
+    const { mode, dimension, dimensionDesc, content, context } = req.body;
+
+    if (!ZHIPU_API_KEY && !SILICONFLOW_API_KEY) {
+        return res.status(500).json({ error: '未配置任何平台的 API Key' });
+    }
+
+    if (mode !== 'classify' || !dimension) {
+        return res.status(400).json({ error: '参数错误' });
+    }
+
+    const prompt = `你是一个文档分类助手。请阅读以下文档内容，判断该文档在「${dimension}」这个维度下应该归到哪一类。
+${dimensionDesc ? `维度说明：${dimensionDesc}` : ''}
+
+要求：
+1. 只输出归类结果，不要任何解释、前缀、引号。
+2. 归类结果要简短（不超过 8 个字）。
+3. 如果无法判断，输出"未识别"。
+
+已知字段：
+- 活动名称：${context?.event || '无'}
+- 时间：${context?.time || '无'}
+- 地点：${context?.location || '无'}
+- 人物/单位：${context?.people || '无'}
+
+文档内容：
+${(content || '').substring(0, 2000)}
+
+请直接输出归类结果：`;
+
+    let lastError = null;
+    for (const config of MODEL_CHAIN) {
+        try {
+            if (!config.supportsBase64) continue;
+            const apiKey = config.platform === 'zhipu' ? ZHIPU_API_KEY : SILICONFLOW_API_KEY;
+            if (!apiKey) continue;
+            const apiUrl = config.platform === 'zhipu' ? ZHIPU_BASE_URL : SILICONFLOW_BASE_URL;
+
+            const requestBody = {
+                model: config.model,
+                messages: [{ role: 'user', content: prompt }]
+            };
+            if (config.needsMaxTokens) requestBody.max_tokens = 50;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                const err = new Error(`分类失败 ${response.status}`);
+                err.status = response.status;
+                if (response.status === 400 || response.status === 429 || response.status >= 500) {
+                    lastError = err;
+                    continue;
+                }
+                throw err;
+            }
+
+            const data = await response.json();
+            let result = (data.choices?.[0]?.message?.content || '').trim();
+            result = result
+                .replace(/^["'「『]|["'」』]$/g, '')
+                .replace(/^归类[:：]?\s*/, '')
+                .replace(/^结果[:：]?\s*/, '')
+                .split('\n')[0]
+                .trim()
+                .substring(0, 20);
+
+            return res.json({ result: result || '未识别', model: config.model });
+        } catch (err) {
+            lastError = err;
+            if (err.status === 400 || err.status === 429 || err.status >= 500) continue;
+            return res.status(err.status || 500).json({ error: err.message });
+        }
+    }
+
+    return res.status(503).json({ error: '所有免费模型均不可用', detail: lastError?.message });
 });
 
 app.listen(PORT, () => {
