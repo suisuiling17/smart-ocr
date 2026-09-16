@@ -1,381 +1,1746 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head><script defer src="https://analytics.supai.app/script.js" data-website-id="9e6c8b1f-7167-4635-b0c2-ea24e3931ac6"></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>智能文件识别与分类系统</title>
 <style>
+
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{--primary:#2563eb;--primary-light:#eff6ff;--bg:#f5f7fb;--card:#fff;--text:#172033;--sub:#64748b;--border:#e2e8f0;--danger:#ef4444;--success:#10b981;--shadow:0 8px 30px rgba(15,23,42,.07);}
-body.dark{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--sub:#94a3b8;--border:#334155;--primary-light:#172554;}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+:root{
+    --primary:#1f2937;
+    --primary-hover:#111827;
+    --primary-light:#f0f2f4;
+    --bg:#f4f4f1;
+    --bg-elevated:#f9f9f7;
+    --card:#ffffff;
+    --text:#18181b;
+    --sub:#71717a;
+    --muted:#a1a1aa;
+    --border:#e7e7e2;
+    --border-strong:#d8d8d2;
+    --danger:#b42318;
+    --danger-bg:#fff4f2;
+    --success:#2f7d5c;
+    --success-bg:#eef7f2;
+    --shadow:0 1px 2px rgba(24,24,27,.03),0 8px 24px rgba(24,24,27,.035);
+    --shadow-lg:0 24px 70px rgba(24,24,27,.16);
+    --radius:14px;
+    --radius-sm:10px;
+}
+
+body.dark{
+    --primary:#f4f4f5;
+    --primary-hover:#ffffff;
+    --primary-light:#27272a;
+    --bg:#111113;
+    --bg-elevated:#151517;
+    --card:#19191c;
+    --text:#f4f4f5;
+    --sub:#a1a1aa;
+    --muted:#71717a;
+    --border:#2a2a2f;
+    --border-strong:#39393f;
+    --danger:#f97066;
+    --danger-bg:#2b1918;
+    --success:#65b58d;
+    --success-bg:#17261f;
+    --shadow:0 1px 2px rgba(0,0,0,.22),0 12px 30px rgba(0,0,0,.16);
+    --shadow-lg:0 28px 80px rgba(0,0,0,.42);
+}
+
+html{background:var(--bg);}
+body{
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    font-size:14px;
+    line-height:1.5;
+    letter-spacing:-.01em;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+}
+button,input,textarea,select{font:inherit;}
+button{outline:none;}
+::selection{background:#dfe3e8;color:#111827;}
+
 .app{display:flex;min-height:100vh;}
-.sidebar{width:250px;background:var(--card);border-right:1px solid var(--border);padding:22px 15px;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:.3s;}
-.logo{display:flex;align-items:center;gap:12px;padding:5px 10px 25px;}
-.logo-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;}
-.logo-text{font-size:17px;font-weight:700;}
-.logo-small{font-size:11px;color:var(--sub);margin-top:3px;}
-.nav{display:flex;flex-direction:column;gap:6px;}
-.nav-item{border:0;background:transparent;width:100%;padding:12px 14px;border-radius:10px;display:flex;align-items:center;gap:12px;cursor:pointer;color:var(--sub);font-size:14px;text-align:left;transition:.2s;}
-.nav-item:hover{background:var(--bg);color:var(--text);}
-.nav-item.active{background:var(--primary-light);color:var(--primary);font-weight:600;}
-.nav-icon{width:22px;text-align:center;font-size:17px;}
-.sidebar-bottom{position:absolute;bottom:20px;left:15px;right:15px;}
-.system-status{background:var(--bg);border-radius:12px;padding:12px;font-size:12px;color:var(--sub);}
-.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--success);margin-right:6px;}
-.main{margin-left:250px;width:calc(100% - 250px);min-height:100vh;}
-.topbar{height:70px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:50;}
-.page-title{font-size:20px;font-weight:700;}
-.top-actions{display:flex;align-items:center;gap:10px;}
-.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:17px;}
+
+/* Sidebar */
+.sidebar{
+    width:240px;
+    background:var(--bg-elevated);
+    border-right:1px solid var(--border);
+    padding:20px 14px;
+    position:fixed;
+    left:0;top:0;bottom:0;
+    z-index:100;
+    transition:transform .25s ease,background .25s ease;
+}
+.logo{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:4px 8px 24px;
+}
+.logo-icon{
+    width:36px;height:36px;
+    border-radius:10px;
+    background:var(--text);
+    color:var(--card);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:-.06em;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.logo-text{font-size:15px;font-weight:650;letter-spacing:-.02em;}
+.logo-small{font-size:11px;color:var(--sub);margin-top:2px;letter-spacing:0;}
+
+.nav{display:flex;flex-direction:column;gap:3px;}
+.nav-item{
+    border:0;
+    background:transparent;
+    width:100%;
+    padding:9px 10px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+    color:var(--sub);
+    font-size:13px;
+    font-weight:500;
+    text-align:left;
+    transition:background .15s ease,color .15s ease;
+}
+.nav-item:hover{background:rgba(127,127,127,.08);color:var(--text);}
+.nav-item.active{
+    background:var(--card);
+    color:var(--text);
+    font-weight:600;
+    box-shadow:0 1px 2px rgba(24,24,27,.05),inset 0 0 0 1px var(--border);
+}
+.nav-icon{
+    width:20px;height:20px;
+    display:grid;place-items:center;
+    color:currentColor;
+    font-size:0;
+    opacity:.92;
+}
+.nav-icon::before{font-size:15px;line-height:1;font-weight:500;}
+.nav-item[data-page="dashboard"] .nav-icon::before{content:"⌂";}
+.nav-item[data-page="upload"] .nav-icon::before{content:"↥";}
+.nav-item[data-page="library"] .nav-icon::before{content:"▦";}
+.nav-item[data-page="search"] .nav-icon::before{content:"⌕";}
+.nav-item[data-page="category"] .nav-icon::before{content:"◇";}
+.nav-item[data-page="statistics"] .nav-icon::before{content:"∿";}
+
+.sidebar-bottom{position:absolute;bottom:18px;left:14px;right:14px;}
+.system-status{
+    padding:10px 11px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--card);
+    color:var(--sub);
+    font-size:11px;
+    display:flex;
+    align-items:center;
+    min-height:38px;
+}
+.status-dot{
+    display:inline-block;
+    width:7px;height:7px;border-radius:50%;
+    background:var(--success);
+    margin-right:8px;
+    box-shadow:0 0 0 3px var(--success-bg);
+}
+
+/* Layout */
+.main{margin-left:240px;width:calc(100% - 240px);min-height:100vh;}
+.topbar{
+    height:64px;
+    background:color-mix(in srgb,var(--bg) 84%,transparent);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 28px;
+    position:sticky;
+    top:0;
+    z-index:50;
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+}
+.page-title{font-size:14px;font-weight:600;color:var(--sub);}
+.top-actions{display:flex;align-items:center;gap:8px;}
+.icon-btn{
+    width:34px;height:34px;
+    border-radius:9px;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+    cursor:pointer;
+    font-size:14px;
+    display:grid;place-items:center;
+    transition:border-color .15s ease,background .15s ease,transform .15s ease;
+}
+.icon-btn:hover{border-color:var(--border-strong);background:var(--bg-elevated);}
+.icon-btn:active{transform:scale(.97);}
 .mobile-menu{display:none;}
-.content{padding:30px;max-width:1500px;margin:auto;}
-.page{display:none;}
+
+.content{
+    padding:38px 34px 56px;
+    max-width:1380px;
+    margin:auto;
+}
+.page{display:none;animation:fadeIn .18s ease;}
 .page.active{display:block;}
-.welcome{margin-bottom:25px;}
-.welcome h1{font-size:28px;margin-bottom:8px;}
-.welcome p{color:var(--sub);}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:25px;}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow);}
-.stat-top{display:flex;justify-content:space-between;align-items:center;}
-.stat-title{color:var(--sub);font-size:13px;}
-.stat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--primary-light);font-size:18px;}
-.stat-number{font-size:29px;font-weight:700;margin-top:10px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);}
-.card-header{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid var(--border);}
-.card-title{font-size:16px;font-weight:700;}
-.card-body{padding:22px;}
-.upload-zone{border:2px dashed #93c5fd;background:var(--primary-light);border-radius:18px;padding:55px 20px;text-align:center;cursor:pointer;transition:.2s;}
-.upload-zone:hover,.upload-zone.dragover{border-color:var(--primary);transform:translateY(-1px);}
-.upload-icon{font-size:48px;margin-bottom:15px;}
-.upload-zone h2{font-size:19px;margin-bottom:8px;}
-.upload-zone p{color:var(--sub);font-size:13px;}
-.upload-types{margin-top:15px;color:var(--sub);font-size:12px;}
-#fileInput{display:none;}
-.upload-buttons{margin-top:20px;display:flex;justify-content:center;gap:10px;}
-.btn{border:0;border-radius:9px;padding:10px 17px;cursor:pointer;font-size:13px;font-weight:600;transition:.2s;}
-.btn:hover{transform:translateY(-1px);}
-.btn-primary{background:var(--primary);color:#fff;}
-.btn-secondary{background:var(--bg);color:var(--text);border:1px solid var(--border);}
-.btn-danger{background:#fee2e2;color:#dc2626;}
-.recent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;}
-.recent-item{border:1px solid var(--border);border-radius:12px;padding:15px;cursor:pointer;transition:.2s;}
-.recent-item:hover{border-color:#93c5fd;}
-.recent-file{display:flex;gap:12px;align-items:center;}
-.file-icon{width:42px;height:42px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:20px;}
-.file-name{font-weight:600;font-size:13px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-.file-meta{color:var(--sub);font-size:11px;margin-top:4px;}
-.search-box{display:flex;gap:10px;margin-bottom:20px;}
-.search-input{flex:1;border:1px solid var(--border);border-radius:10px;padding:13px 15px;background:var(--card);color:var(--text);outline:none;font-size:14px;}
-.search-input:focus{border-color:var(--primary);}
-.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
-.filter-btn{padding:7px 13px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--sub);cursor:pointer;font-size:12px;}
-.filter-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
-.table-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;}
-th,td{text-align:left;padding:14px 12px;border-bottom:1px solid var(--border);font-size:13px;}
-th{color:var(--sub);font-size:12px;font-weight:600;}
-tbody tr:hover{background:var(--bg);}
-.tag{display:inline-block;padding:4px 9px;border-radius:20px;background:var(--primary-light);color:var(--primary);font-size:11px;margin:2px;}
-.empty{text-align:center;color:var(--sub);padding:50px 20px;}
-.category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;}
-.category-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
-.category-card h3{font-size:15px;}
-.category-count{font-size:27px;font-weight:700;margin-top:8px;}
-.category-rule{color:var(--sub);font-size:11px;margin-top:7px;}
-.rule-list{display:flex;flex-direction:column;gap:12px;}
-.rule-item{border:1px solid var(--border);border-radius:12px;padding:15px;display:flex;justify-content:space-between;align-items:center;}
-.rule-info{display:flex;flex-direction:column;gap:5px;}
-.rule-name{font-weight:600;}
-.rule-keywords{color:var(--sub);font-size:12px;}
-.rule-actions{display:flex;gap:7px;}
-.modal-mask{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:500;align-items:center;justify-content:center;padding:20px;}
-.modal-mask.show{display:flex;}
-.modal{background:var(--card);width:700px;max-width:100%;max-height:90vh;overflow:auto;border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.25);}
-.modal-header{padding:20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
-.modal-header h2{font-size:18px;}
-.modal-close{background:transparent;border:0;font-size:22px;cursor:pointer;color:var(--sub);}
-.modal-body{padding:20px;}
-.form-group{margin-bottom:16px;}
-.form-label{display:block;font-size:12px;font-weight:600;margin-bottom:7px;}
-.form-input,.form-textarea,.form-select{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;background:var(--card);color:var(--text);outline:none;}
-.form-textarea{min-height:100px;resize:vertical;}
-.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--primary);}
-.modal-footer{padding:15px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.image-viewer{background:#1e293b;border-radius:12px;min-height:420px;position:relative;overflow:hidden;cursor:grab;user-select:none;}
-.image-viewer:active{cursor:grabbing;}
-.image-viewer img{position:absolute;top:0;left:0;transform-origin:0 0;transition:transform .05s linear;pointer-events:none;max-width:none;}
-.viewer-toolbar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:rgba(0,0,0,.65);padding:6px 10px;border-radius:20px;z-index:10;}
-.viewer-toolbar button{background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:14px;font-weight:600;}
-.viewer-toolbar button:hover{background:rgba(255,255,255,.3);}
-.viewer-hint{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;padding:5px 10px;border-radius:8px;font-size:11px;z-index:10;}
-.preview-fallback{background:var(--bg);border-radius:12px;min-height:420px;display:flex;justify-content:center;align-items:center;color:var(--sub);text-align:center;padding:40px;}
-.detail-section{margin-bottom:20px;}
-.detail-section h3{font-size:14px;margin-bottom:10px;}
-.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
-.info-box{background:var(--bg);padding:12px;border-radius:9px;}
-.info-box label{display:block;color:var(--sub);font-size:11px;margin-bottom:5px;}
-.info-box span{font-size:13px;word-break:break-all;}
-.ocr-text{white-space:pre-wrap;background:var(--bg);border-radius:10px;padding:15px;font-size:13px;line-height:1.8;max-height:300px;overflow:auto;}
-.progress-box{margin-top:20px;display:none;}
-.progress-box.show{display:block;}
-.progress-text{font-size:13px;margin-bottom:7px;}
-.progress{height:8px;background:var(--border);border-radius:10px;overflow:hidden;}
-.progress-bar{height:100%;width:0;background:var(--primary);transition:.2s;}
-.toast{position:fixed;right:25px;bottom:25px;background:#172033;color:#fff;padding:13px 17px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transform:translateY(20px);transition:.25s;z-index:1000;}
-.toast.show{opacity:1;transform:translateY(0);}
-/* ========= 命名规则面板 ========= */
-.naming-panel{
-    margin-top:15px;
+@keyframes fadeIn{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:none}}
+
+.welcome{margin-bottom:26px;}
+.welcome h1{
+    font-size:27px;
+    line-height:1.22;
+    margin-bottom:7px;
+    font-weight:650;
+    letter-spacing:-.035em;
+}
+.welcome p{color:var(--sub);font-size:13px;letter-spacing:0;}
+
+/* Stats */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:18px;
+}
+.stat-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px 18px 16px;
+    box-shadow:var(--shadow);
+    min-height:118px;
+}
+.stat-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.stat-title{color:var(--sub);font-size:12px;font-weight:500;letter-spacing:.01em;}
+.stat-icon{
+    width:30px;height:30px;
+    border-radius:8px;
+    display:grid;
+    place-items:center;
+    background:var(--bg);
+    color:var(--sub);
+    font-size:0;
+}
+.stat-icon::before{font-size:14px;line-height:1;color:var(--sub);}
+.stats .stat-card:nth-child(1) .stat-icon::before{content:"▦";}
+.stats .stat-card:nth-child(2) .stat-icon::before{content:"▧";}
+.stats .stat-card:nth-child(3) .stat-icon::before{content:"◎";}
+.stats .stat-card:nth-child(4) .stat-icon::before{content:"◇";}
+.stat-number{
+    font-size:30px;
+    line-height:1;
+    font-weight:650;
+    margin-top:18px;
+    letter-spacing:-.045em;
+    font-variant-numeric:tabular-nums;
+}
+
+/* Cards */
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+}
+.card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
     padding:16px 18px;
+    border-bottom:1px solid var(--border);
+    min-height:58px;
+}
+.card-title{font-size:14px;font-weight:620;letter-spacing:-.015em;}
+.card-body{padding:18px;}
+
+/* Upload */
+.upload-zone{
+    border:1px dashed var(--border-strong);
+    background:var(--bg-elevated);
+    border-radius:12px;
+    padding:54px 22px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .18s ease,background .18s ease,transform .18s ease;
+}
+.upload-zone:hover,.upload-zone.dragover{
+    border-color:var(--sub);
+    background:var(--bg);
+}
+.upload-zone.dragover{transform:scale(.997);}
+.upload-icon{
+    width:42px;height:42px;
+    margin:0 auto 16px;
+    border-radius:11px;
+    border:1px solid var(--border);
+    background:var(--card);
+    display:grid;place-items:center;
+    color:var(--text);
+    font-size:0;
+    box-shadow:0 1px 2px rgba(24,24,27,.05);
+}
+.upload-icon::before{content:"＋";font-size:22px;font-weight:300;line-height:1;}
+.upload-zone h2{font-size:15px;margin-bottom:6px;font-weight:620;}
+.upload-zone p{color:var(--sub);font-size:12px;}
+.upload-types{margin-top:9px;color:var(--muted);font-size:11px;letter-spacing:.01em;}
+#fileInput{display:none;}
+.upload-buttons{margin-top:18px;display:flex;justify-content:center;gap:8px;}
+
+/* Buttons */
+.btn{
+    border:1px solid transparent;
+    border-radius:8px;
+    padding:8px 13px;
+    cursor:pointer;
+    font-size:12px;
+    line-height:1.3;
+    font-weight:600;
+    transition:background .15s ease,border-color .15s ease,transform .15s ease,box-shadow .15s ease;
+    white-space:nowrap;
+}
+.btn:hover{transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn-primary{
+    background:var(--text);
+    color:var(--card);
+    border-color:var(--text);
+    box-shadow:0 1px 2px rgba(24,24,27,.12);
+}
+.btn-primary:hover{opacity:.9;}
+.btn-secondary{
+    background:var(--card);
+    color:var(--text);
+    border-color:var(--border);
+}
+.btn-secondary:hover{border-color:var(--border-strong);background:var(--bg-elevated);}
+.btn-danger{
+    background:transparent;
+    color:var(--danger);
+    border-color:transparent;
+}
+.btn-danger:hover{background:var(--danger-bg);border-color:transparent;}
+
+/* Recent files */
+.recent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.recent-item{
+    border:1px solid var(--border);
+    border-radius:11px;
+    padding:13px;
+    cursor:pointer;
+    transition:border-color .15s ease,background .15s ease,transform .15s ease;
+}
+.recent-item:hover{border-color:var(--border-strong);background:var(--bg-elevated);transform:translateY(-1px);}
+.recent-file{display:flex;gap:11px;align-items:center;}
+.file-icon{
+    width:36px;height:36px;
+    flex:0 0 36px;
+    border-radius:9px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    display:grid;
+    place-items:center;
+    font-size:0;
+    color:var(--sub);
+}
+.file-icon::before{content:"▧";font-size:15px;}
+.file-name{font-weight:600;font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.file-meta{color:var(--sub);font-size:10px;margin-top:4px;}
+
+/* Search / filters */
+.search-box{display:flex;gap:8px;margin-bottom:16px;}
+.search-input{
+    flex:1;
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:10px 12px;
+    background:var(--card);
+    color:var(--text);
+    outline:none;
+    font-size:12px;
+    transition:border-color .15s ease,box-shadow .15s ease;
+}
+.search-input::placeholder{color:var(--muted);}
+.search-input:focus{
+    border-color:var(--border-strong);
+    box-shadow:0 0 0 3px rgba(113,113,122,.08);
+}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.filter-btn,.preset-btn{
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--sub);
+    cursor:pointer;
+    font-size:11px;
+    font-weight:500;
+    transition:.15s ease;
+}
+.filter-btn:hover,.preset-btn:hover{color:var(--text);border-color:var(--border-strong);background:var(--bg-elevated);}
+.filter-btn.active{
+    background:var(--text);
+    color:var(--card);
+    border-color:var(--text);
+}
+
+/* Tables */
+.table-wrap{overflow-x:auto;margin:0 -2px;}
+table{width:100%;border-collapse:collapse;}
+th,td{
+    text-align:left;
+    padding:13px 11px;
+    border-bottom:1px solid var(--border);
+    font-size:12px;
+    vertical-align:middle;
+}
+th{
+    color:var(--sub);
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.03em;
+    text-transform:none;
+    background:var(--card);
+}
+tbody tr{transition:background .12s ease;}
+tbody tr:hover{background:var(--bg-elevated);}
+tbody tr:last-child td{border-bottom:0;}
+
+.tag{
+    display:inline-flex;
+    align-items:center;
+    padding:3px 7px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--bg-elevated);
+    color:var(--sub);
+    font-size:10px;
+    line-height:1.35;
+    margin:2px;
+}
+.empty{text-align:center;color:var(--sub);padding:48px 20px;font-size:12px;}
+
+/* Category */
+.category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.category-card{
     background:var(--card);
     border:1px solid var(--border);
     border-radius:12px;
+    padding:17px;
+    box-shadow:var(--shadow);
+}
+.category-card>div:first-child{font-size:0!important;margin-bottom:11px!important;}
+.category-card>div:first-child::before{
+    content:"◇";
+    display:grid;place-items:center;
+    width:30px;height:30px;
+    border-radius:8px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    color:var(--sub);
+    font-size:14px;
+}
+.category-card h3{font-size:13px;font-weight:620;}
+.category-count{font-size:26px;font-weight:650;margin-top:8px;letter-spacing:-.04em;}
+.category-rule{color:var(--sub);font-size:10px;margin-top:8px;line-height:1.6;}
+.rule-list{display:flex;flex-direction:column;gap:8px;}
+.rule-item{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:13px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+}
+.rule-info{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.rule-name{font-weight:600;font-size:12px;}
+.rule-keywords{color:var(--sub);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rule-actions{display:flex;gap:5px;flex-shrink:0;}
+
+/* Modal */
+.modal-mask{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(24,24,27,.42);
+    z-index:500;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    backdrop-filter:blur(5px);
+}
+.modal-mask.show{display:flex;}
+.modal{
+    background:var(--card);
+    width:700px;
+    max-width:100%;
+    max-height:90vh;
+    overflow:auto;
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:var(--shadow-lg);
+}
+.modal-header{
+    padding:17px 18px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    background:var(--card);
+    z-index:2;
+}
+.modal-header h2{font-size:15px;font-weight:650;}
+.modal-close{
+    width:30px;height:30px;
+    display:grid;place-items:center;
+    background:transparent;
+    border:0;
+    border-radius:8px;
+    font-size:20px;
+    cursor:pointer;
+    color:var(--sub);
+}
+.modal-close:hover{background:var(--bg);color:var(--text);}
+.modal-body{padding:18px;}
+.modal-footer{
+    padding:13px 18px;
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    position:sticky;
+    bottom:0;
+    background:var(--card);
+}
+
+.form-group{margin-bottom:15px;}
+.form-label{display:block;font-size:11px;font-weight:600;margin-bottom:6px;color:var(--sub);}
+.form-input,.form-textarea,.form-select{
+    width:100%;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:9px 10px;
+    background:var(--card);
+    color:var(--text);
+    outline:none;
+    font-size:12px;
+    transition:border-color .15s ease,box-shadow .15s ease;
+}
+.form-textarea{min-height:110px;resize:vertical;line-height:1.7;}
+.form-input:focus,.form-textarea:focus,.form-select:focus{
+    border-color:var(--border-strong);
+    box-shadow:0 0 0 3px rgba(113,113,122,.08);
+}
+
+/* Detail */
+.detail-grid{display:grid;grid-template-columns:1.06fr .94fr;gap:20px;}
+.image-viewer{
+    background:#111214;
+    border-radius:11px;
+    min-height:430px;
+    position:relative;
+    overflow:hidden;
+    cursor:grab;
+    user-select:none;
+}
+.image-viewer:active{cursor:grabbing;}
+.image-viewer img{
+    position:absolute;top:0;left:0;
+    transform-origin:0 0;
+    transition:transform .05s linear;
+    pointer-events:none;
+    max-width:none;
+}
+.viewer-toolbar{
+    position:absolute;
+    bottom:12px;left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:3px;
+    background:rgba(20,20,22,.78);
+    border:1px solid rgba(255,255,255,.08);
+    padding:4px;
+    border-radius:9px;
+    z-index:10;
+    backdrop-filter:blur(12px);
+}
+.viewer-toolbar button{
+    width:31px;height:29px;
+    background:transparent;
+    color:#fff;
+    border:0;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+}
+.viewer-toolbar button:hover{background:rgba(255,255,255,.1);}
+.viewer-hint{
+    position:absolute;
+    top:10px;left:10px;
+    background:rgba(20,20,22,.72);
+    border:1px solid rgba(255,255,255,.08);
+    color:#d4d4d8;
+    padding:5px 8px;
+    border-radius:7px;
+    font-size:10px;
+    z-index:10;
+    backdrop-filter:blur(10px);
+}
+.preview-fallback{
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:11px;
+    min-height:430px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:var(--sub);
+    text-align:center;
+    padding:40px;
+}
+.detail-section{margin-bottom:19px;}
+.detail-section h3{font-size:11px;margin-bottom:8px;color:var(--sub);font-weight:600;letter-spacing:.02em;}
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.info-box{
+    background:var(--bg-elevated);
+    border:1px solid var(--border);
+    padding:10px;
+    border-radius:8px;
+}
+.info-box label{display:block;color:var(--sub);font-size:9px;margin-bottom:4px;}
+.info-box span{font-size:11px;word-break:break-all;}
+.ocr-text{
+    white-space:pre-wrap;
+    background:var(--bg-elevated);
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:13px;
+    font-size:11px;
+    line-height:1.75;
+    max-height:300px;
+    overflow:auto;
+}
+
+/* Progress */
+.progress-box{margin-top:18px;display:none;}
+.progress-box.show{display:block;}
+.progress-text{font-size:11px;margin-bottom:7px;color:var(--sub);}
+.progress{height:5px;background:var(--border);border-radius:999px;overflow:hidden;}
+.progress-bar{height:100%;width:0;background:var(--text);transition:.2s;border-radius:999px;}
+
+/* Toast */
+.toast{
+    position:fixed;
+    right:22px;bottom:22px;
+    background:#18181b;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.08);
+    padding:10px 13px;
+    border-radius:9px;
+    font-size:11px;
+    opacity:0;
+    pointer-events:none;
+    transform:translateY(12px);
+    transition:.22s ease;
+    z-index:1000;
+    box-shadow:0 14px 40px rgba(0,0,0,.18);
+}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* Naming panel */
+.naming-panel{
+    margin-top:14px;
+    padding:16px;
+    background:var(--bg-elevated);
+    border:1px solid var(--border);
+    border-radius:11px;
 }
 .naming-panel-header{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    margin-bottom:12px;
+    margin-bottom:11px;
     flex-wrap:wrap;
-    gap:10px;
-}
-.naming-panel-title{font-size:14px;font-weight:700;}
-.naming-preset-row{
-    display:flex;
     gap:8px;
-    flex-wrap:wrap;
-    margin-bottom:12px;
 }
-.preset-btn{
-    padding:6px 12px;
-    border-radius:20px;
-    border:1px solid var(--border);
-    background:var(--bg);
-    color:var(--sub);
-    cursor:pointer;
-    font-size:12px;
-    transition:.2s;
-}
-.preset-btn:hover{background:var(--primary-light);color:var(--primary);border-color:#93c5fd;}
-.custom-input-row{
-    display:flex;
-    gap:10px;
-    margin-bottom:10px;
-}
+.naming-panel-title{font-size:12px;font-weight:650;}
+.naming-preset-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px;}
+.custom-input-row{display:flex;gap:8px;margin-bottom:9px;}
 .custom-input{
     flex:1;
-    padding:10px 12px;
+    padding:9px 10px;
     border:1px solid var(--border);
-    border-radius:9px;
+    border-radius:8px;
     background:var(--card);
     color:var(--text);
-    font-family:'Consolas','Monaco',monospace;
-    font-size:13px;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    font-size:11px;
     outline:none;
 }
-.custom-input:focus{border-color:var(--primary);}
-.var-chips{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    margin-top:8px;
-}
+.custom-input:focus{border-color:var(--border-strong);box-shadow:0 0 0 3px rgba(113,113,122,.08);}
+.var-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
 .var-chip{
-    padding:4px 9px;
-    background:var(--primary-light);
-    color:var(--primary);
+    padding:4px 7px;
+    background:var(--card);
+    color:var(--sub);
     border-radius:6px;
-    font-size:11px;
+    font-size:10px;
     cursor:pointer;
-    font-family:'Consolas','Monaco',monospace;
-    border:1px solid transparent;
-    transition:.15s;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    border:1px solid var(--border);
+    transition:.15s ease;
 }
-.var-chip:hover{background:var(--primary);color:#fff;}
+.var-chip:hover{color:var(--text);border-color:var(--border-strong);}
 .naming-preview{
     margin-top:10px;
-    padding:8px 12px;
-    background:var(--bg);
+    padding:9px 10px;
+    background:var(--card);
+    border:1px solid var(--border);
     border-radius:8px;
-    font-size:12px;
+    font-size:10px;
+    line-height:1.7;
     color:var(--sub);
     word-break:break-all;
 }
-.naming-preview b{color:var(--primary);}
-@media(max-width:1100px){.stats{grid-template-columns:repeat(2,1fr);}.category-grid{grid-template-columns:repeat(2,1fr);}.recent-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:800px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.main{margin-left:0;width:100%;}.mobile-menu{display:block;}.topbar{padding:0 15px;}.content{padding:18px;}.stats{grid-template-columns:1fr 1fr;gap:10px;}.recent-grid{grid-template-columns:1fr;}.category-grid{grid-template-columns:1fr 1fr;}.detail-grid{grid-template-columns:1fr;}}
-@media(max-width:500px){.stats{grid-template-columns:1fr;}.category-grid{grid-template-columns:1fr;}.welcome h1{font-size:23px;}.upload-zone{padding:40px 15px;}.info-grid{grid-template-columns:1fr;}.custom-input-row{flex-direction:column;}}
+.naming-preview b{color:var(--text);font-weight:600;}
+
+code{
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    font-size:.95em;
+    padding:1px 4px;
+    border:1px solid var(--border);
+    border-radius:5px;
+    background:var(--bg-elevated);
+}
+
+/* Responsive */
+@media(max-width:1100px){
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .category-grid{grid-template-columns:repeat(2,1fr);}
+    .recent-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:800px){
+    .sidebar{transform:translateX(-100%);box-shadow:18px 0 55px rgba(24,24,27,.12);}
+    .sidebar.open{transform:translateX(0);}
+    .main{margin-left:0;width:100%;}
+    .mobile-menu{display:grid;}
+    .topbar{padding:0 16px;height:60px;}
+    .content{padding:24px 16px 42px;}
+    .stats{grid-template-columns:1fr 1fr;gap:9px;}
+    .recent-grid{grid-template-columns:1fr;}
+    .category-grid{grid-template-columns:1fr 1fr;}
+    .detail-grid{grid-template-columns:1fr;}
+    .welcome h1{font-size:24px;}
+}
+@media(max-width:500px){
+    .stats{grid-template-columns:1fr 1fr;}
+    .stat-card{min-height:104px;padding:15px;}
+    .stat-number{font-size:26px;}
+    .category-grid{grid-template-columns:1fr;}
+    .upload-zone{padding:42px 14px;}
+    .info-grid{grid-template-columns:1fr;}
+    .custom-input-row{flex-direction:column;}
+    .search-box{flex-direction:column;}
+    .rule-item{align-items:flex-start;flex-direction:column;}
+    .rule-actions{width:100%;}
+    .rule-actions .btn{flex:1;}
+}
+
+
+/* ================================
+   Interactive mascot · Office Dog
+   Pure UI layer — does not touch app logic
+================================ */
+:root{
+    --dog-ink:#27272a;
+    --dog-soft:#faf9f6;
+    --dog-accent:#d97757;
+    --dog-shadow:0 18px 55px rgba(24,24,27,.16);
+}
+body.dark{
+    --dog-ink:#ecece8;
+    --dog-soft:#27272a;
+    --dog-accent:#e89979;
+    --dog-shadow:0 18px 60px rgba(0,0,0,.38);
+}
+.mascot-dock{
+    position:fixed;
+    right:24px;
+    bottom:24px;
+    width:112px;
+    height:126px;
+    z-index:920;
+    user-select:none;
+    touch-action:none;
+    cursor:grab;
+    filter:drop-shadow(0 12px 24px rgba(24,24,27,.08));
+    transition:filter .25s ease, opacity .25s ease;
+}
+.mascot-dock:active{cursor:grabbing;}
+.mascot-dock.dragging{filter:drop-shadow(0 18px 36px rgba(24,24,27,.18));}
+.mascot-stage{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+}
+.mascot-halo{
+    position:absolute;
+    width:92px;
+    height:35px;
+    left:10px;
+    bottom:0;
+    border-radius:50%;
+    background:radial-gradient(ellipse,rgba(24,24,27,.13),rgba(24,24,27,0) 68%);
+    opacity:.62;
+    transform:scaleX(.92);
+    transition:.3s ease;
+}
+body.dark .mascot-halo{
+    background:radial-gradient(ellipse,rgba(255,255,255,.14),rgba(255,255,255,0) 68%);
+}
+.mascot-dog{
+    position:absolute;
+    width:100px;
+    height:104px;
+    left:6px;
+    bottom:8px;
+    transform-origin:50% 92%;
+    will-change:transform;
+}
+.mascot-dog .dog-line{
+    fill:none;
+    stroke:var(--dog-ink);
+    stroke-width:2.15;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    vector-effect:non-scaling-stroke;
+}
+.mascot-dog .dog-fill{fill:var(--dog-soft);stroke:var(--dog-ink);stroke-width:2.15;}
+.mascot-dog .dog-accent{fill:var(--dog-accent);stroke:var(--dog-ink);stroke-width:1.6;}
+.mascot-dog .dog-eye{fill:var(--dog-ink);transform-origin:center;}
+.mascot-dog .dog-cheek{fill:var(--dog-accent);opacity:.0;transition:opacity .18s ease;}
+.mascot-dog .dog-tail{transform-origin:81px 73px;}
+.mascot-dog .dog-ear-left{transform-origin:28px 27px;}
+.mascot-dog .dog-ear-right{transform-origin:72px 27px;}
+.mascot-dog .dog-head{transform-origin:50px 52px;}
+.mascot-dog .dog-paw{transform-origin:center;}
+.mascot-dog .dog-mouth-happy{opacity:0;transition:opacity .15s ease;}
+.mascot-dog .dog-mouth-neutral{opacity:1;transition:opacity .15s ease;}
+
+/* idle = calm breathing */
+.mascot-dock:not(.working):not(.celebrate):not(.reaction) .mascot-dog{
+    animation:dogBreathe 3.4s ease-in-out infinite;
+}
+.mascot-dock:not(.working):not(.celebrate):not(.reaction) .dog-tail{
+    animation:tailIdle 3.8s ease-in-out infinite;
+}
+
+/* working = attentive, tail moving, tiny head tilt */
+.mascot-dock.working .mascot-dog{animation:dogWork 1.9s ease-in-out infinite;}
+.mascot-dock.working .dog-tail{animation:tailWork .42s ease-in-out infinite alternate;}
+.mascot-dock.working .dog-ear-right{animation:earListen 1.4s ease-in-out infinite;}
+.mascot-dock.working .mascot-halo{transform:scaleX(1.04);opacity:.8;}
+.mascot-dock.working .dog-eye{animation:blink 3.1s infinite;}
+
+/* click reaction */
+.mascot-dock.reaction .mascot-dog{animation:dogBoop .52s cubic-bezier(.2,.9,.3,1.2);}
+.mascot-dock.reaction .dog-tail{animation:tailWork .19s ease-in-out 4 alternate;}
+.mascot-dock.reaction .dog-cheek{opacity:.44;}
+
+/* completion celebration */
+.mascot-dock.celebrate .mascot-dog{animation:dogCelebrate .78s cubic-bezier(.24,.8,.28,1) 2;}
+.mascot-dock.celebrate .dog-tail{animation:tailParty .16s ease-in-out infinite alternate;}
+.mascot-dock.celebrate .dog-mouth-neutral{opacity:0;}
+.mascot-dock.celebrate .dog-mouth-happy{opacity:1;}
+.mascot-dock.celebrate .dog-cheek{opacity:.5;}
+.mascot-dock.celebrate .mascot-halo{animation:haloPulse .7s ease-out 2;}
+
+.mascot-bubble{
+    position:absolute;
+    right:70px;
+    bottom:94px;
+    min-width:96px;
+    max-width:190px;
+    padding:9px 11px;
+    border:1px solid var(--border);
+    border-radius:13px 13px 4px 13px;
+    background:color-mix(in srgb,var(--card) 93%,transparent);
+    color:var(--text);
+    box-shadow:var(--dog-shadow);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    font-size:11px;
+    line-height:1.45;
+    letter-spacing:.01em;
+    opacity:0;
+    transform:translateY(7px) scale(.96);
+    transform-origin:100% 100%;
+    pointer-events:none;
+    transition:opacity .18s ease, transform .22s cubic-bezier(.2,.85,.35,1.1);
+}
+.mascot-bubble.show{
+    opacity:1;
+    transform:translateY(0) scale(1);
+}
+.mascot-bubble b{font-weight:700;}
+.mascot-badge{
+    position:absolute;
+    right:-3px;
+    top:17px;
+    height:21px;
+    min-width:21px;
+    padding:0 6px;
+    border-radius:999px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--text);
+    color:var(--card);
+    border:2px solid var(--card);
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.01em;
+    opacity:0;
+    transform:scale(.75);
+    transition:.18s ease;
+}
+.mascot-badge.show{opacity:1;transform:scale(1);}
+.mascot-hint{
+    position:absolute;
+    left:50%;
+    bottom:-14px;
+    transform:translateX(-50%);
+    white-space:nowrap;
+    font-size:9px;
+    color:var(--muted);
+    opacity:0;
+    transition:.2s ease;
+    pointer-events:none;
+}
+.mascot-dock:hover .mascot-hint{opacity:1;}
+.mascot-particles{
+    position:absolute;
+    inset:-18px;
+    pointer-events:none;
+    overflow:visible;
+}
+.mascot-particle{
+    position:absolute;
+    left:56px;
+    top:58px;
+    width:7px;
+    height:7px;
+    border:1.4px solid var(--dog-accent);
+    border-radius:2px;
+    opacity:0;
+    transform:translate(0,0) rotate(0);
+}
+.mascot-particle.pop{animation:particlePop .85s ease-out forwards;}
+.mascot-dock.sleepy .dog-eye{transform:scaleY(.16);}
+.mascot-dock.sleepy .mascot-dog{transform:translateY(3px) rotate(-1deg);}
+.mascot-dock.sleepy .dog-head{transform:rotate(-4deg);}
+
+/* refined micro-interactions across existing UI */
+.card,.stat-card,.recent-item,.category-card{
+    transition:transform .24s cubic-bezier(.2,.8,.3,1), border-color .24s ease, box-shadow .24s ease, background .24s ease;
+}
+.stat-card:hover,.category-card:hover{
+    transform:translateY(-2px);
+    border-color:var(--border-strong);
+    box-shadow:0 12px 34px rgba(24,24,27,.06);
+}
+.recent-item:hover{transform:translateY(-1px);}
+.btn,.icon-btn,.nav-item,.filter-btn,.preset-btn,.var-chip{
+    transition:transform .16s ease, background .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.btn:active,.icon-btn:active,.filter-btn:active,.preset-btn:active{transform:scale(.97);}
+.upload-zone{position:relative;overflow:hidden;}
+.upload-zone::after{
+    content:"";
+    position:absolute;
+    width:180px;height:180px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(24,24,27,.055),transparent 68%);
+    right:-70px;top:-90px;
+    opacity:0;
+    transform:scale(.8);
+    transition:.3s ease;
+    pointer-events:none;
+}
+.upload-zone:hover::after,.upload-zone.dragover::after{opacity:1;transform:scale(1);}
+.progress-bar{position:relative;overflow:hidden;}
+.progress-bar::after{
+    content:"";
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent);
+    transform:translateX(-100%);
+}
+.progress-box.show .progress-bar::after{animation:progressSheen 1.25s linear infinite;}
+
+@keyframes dogBreathe{
+    0%,100%{transform:translateY(0) scaleY(1)}
+    50%{transform:translateY(1px) scaleY(.985)}
+}
+@keyframes tailIdle{
+    0%,78%,100%{transform:rotate(4deg)}
+    84%{transform:rotate(11deg)}
+    90%{transform:rotate(-3deg)}
+    95%{transform:rotate(8deg)}
+}
+@keyframes tailWork{
+    from{transform:rotate(-16deg)}
+    to{transform:rotate(24deg)}
+}
+@keyframes tailParty{
+    from{transform:rotate(-24deg) scaleY(.96)}
+    to{transform:rotate(32deg) scaleY(1.03)}
+}
+@keyframes dogWork{
+    0%,100%{transform:translateY(0) rotate(0)}
+    40%{transform:translateY(-1px) rotate(-1.5deg)}
+    70%{transform:translateY(0) rotate(1deg)}
+}
+@keyframes earListen{
+    0%,70%,100%{transform:rotate(0)}
+    80%{transform:rotate(8deg)}
+    90%{transform:rotate(-3deg)}
+}
+@keyframes dogBoop{
+    0%{transform:scale(1) translateY(0)}
+    40%{transform:scale(.94,1.06) translateY(-3px)}
+    72%{transform:scale(1.04,.96) translateY(1px)}
+    100%{transform:scale(1) translateY(0)}
+}
+@keyframes dogCelebrate{
+    0%,100%{transform:translateY(0) rotate(0)}
+    25%{transform:translateY(-17px) rotate(-6deg)}
+    48%{transform:translateY(-4px) rotate(5deg)}
+    66%{transform:translateY(-13px) rotate(4deg)}
+}
+@keyframes haloPulse{
+    0%,100%{transform:scaleX(.92);opacity:.62}
+    50%{transform:scaleX(1.2);opacity:.25}
+}
+@keyframes blink{
+    0%,45%,48%,100%{transform:scaleY(1)}
+    46%,47%{transform:scaleY(.08)}
+}
+@keyframes particlePop{
+    0%{opacity:0;transform:translate(0,0) rotate(0) scale(.6)}
+    12%{opacity:1}
+    100%{opacity:0;transform:translate(var(--px),var(--py)) rotate(var(--pr)) scale(1.15)}
+}
+@keyframes progressSheen{
+    to{transform:translateX(100%)}
+}
+@media(max-width:800px){
+    .mascot-dock{right:14px;bottom:18px;transform:scale(.88);transform-origin:100% 100%;}
+    .mascot-bubble{right:62px;max-width:155px;}
+    .mascot-hint{display:none;}
+}
+@media(prefers-reduced-motion:reduce){
+    .mascot-dog,.dog-tail,.dog-ear-right,.dog-eye,.mascot-halo,.mascot-particle,.progress-bar::after{animation:none!important;}
+    .mascot-dock,.mascot-bubble,.card,.stat-card,.recent-item,.category-card{transition:none!important;}
+}
+
+
+/* =========================================
+   Sitewide premium interaction layer
+   Visual effects only — core app logic untouched
+========================================= */
+:root{
+    --fx-ink:24,24,27;
+    --fx-accent:217,119,87;
+    --fx-soft:255,255,255;
+}
+body.dark{
+    --fx-ink:244,244,245;
+    --fx-accent:232,153,121;
+    --fx-soft:25,25,28;
+}
+body{
+    --cursor-x:50vw;
+    --cursor-y:50vh;
+}
+
+/* A very soft ambient light that follows the pointer */
+.site-cursor-aura{
+    position:fixed;
+    left:0;top:0;
+    width:360px;height:360px;
+    margin:-180px 0 0 -180px;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:4;
+    opacity:0;
+    transform:translate3d(var(--fx-cursor-x,50vw),var(--fx-cursor-y,50vh),0);
+    background:radial-gradient(circle,
+        rgba(var(--fx-accent),.075) 0%,
+        rgba(var(--fx-ink),.035) 28%,
+        rgba(var(--fx-ink),0) 68%);
+    filter:blur(2px);
+    transition:opacity .28s ease;
+    mix-blend-mode:multiply;
+}
+body.dark .site-cursor-aura{mix-blend-mode:screen;opacity:.0;}
+body.fx-pointer-active .site-cursor-aura{opacity:1;}
+body.dark.fx-pointer-active .site-cursor-aura{opacity:.58;}
+
+/* Fixed effects canvas, visually above UI but never intercepting input */
+.site-fx-layer{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:1600;
+    overflow:hidden;
+}
+.site-ripple{
+    position:fixed;
+    width:18px;height:18px;
+    margin:-9px 0 0 -9px;
+    border-radius:50%;
+    border:1px solid rgba(var(--fx-ink),.34);
+    box-shadow:0 0 0 1px rgba(var(--fx-soft),.22) inset;
+    animation:siteRipple .66s cubic-bezier(.15,.72,.18,1) forwards;
+}
+.site-ripple.strong{
+    border-color:rgba(var(--fx-accent),.72);
+    box-shadow:0 0 22px rgba(var(--fx-accent),.14);
+}
+.site-spark{
+    position:fixed;
+    width:5px;height:5px;
+    margin:-2.5px 0 0 -2.5px;
+    border-radius:99px;
+    background:rgba(var(--fx-accent),.82);
+    opacity:0;
+    animation:siteSpark .62s cubic-bezier(.16,.82,.27,1) forwards;
+}
+.site-spark.alt{
+    width:4px;height:4px;
+    background:rgba(var(--fx-ink),.56);
+}
+.site-click-flash{
+    position:fixed;
+    width:4px;height:4px;
+    margin:-2px 0 0 -2px;
+    border-radius:50%;
+    background:rgba(var(--fx-soft),.92);
+    box-shadow:0 0 0 7px rgba(var(--fx-accent),.11),0 0 28px rgba(var(--fx-accent),.2);
+    animation:clickFlash .46s ease-out forwards;
+}
+
+/* Elevated surfaces get a restrained moving sheen */
+.fx-surface{
+    --fx-glow-x:50%;
+    --fx-glow-y:50%;
+    position:relative;
+    isolation:isolate;
+    transform-style:preserve-3d;
+}
+.fx-glare{
+    position:absolute;
+    inset:0;
+    z-index:8;
+    pointer-events:none;
+    border-radius:inherit;
+    opacity:0;
+    background:
+        radial-gradient(180px circle at var(--fx-glow-x) var(--fx-glow-y),
+            rgba(var(--fx-accent),.09),
+            rgba(var(--fx-ink),.025) 37%,
+            transparent 68%);
+    transition:opacity .22s ease;
+}
+.fx-surface:hover>.fx-glare{opacity:1;}
+.fx-surface.fx-pressed{
+    animation:surfacePress .38s cubic-bezier(.18,.72,.24,1);
+}
+.fx-surface.fx-pop{
+    animation:surfacePop .5s cubic-bezier(.16,.82,.25,1.15);
+}
+
+/* Buttons feel slightly magnetic and tactile */
+.fx-magnetic{
+    --mx:0px;
+    --my:0px;
+}
+.fx-magnetic:not(:active){
+    transform:translate3d(var(--mx),var(--my),0);
+}
+.fx-magnetic.fx-hit{
+    animation:buttonHit .34s cubic-bezier(.2,.8,.2,1);
+}
+
+/* Navigation receives a tiny travelling highlight on selection */
+.nav-item{position:relative;overflow:hidden;}
+.nav-item::after{
+    content:"";
+    position:absolute;
+    left:-28%;
+    top:-50%;
+    width:34%;
+    height:200%;
+    pointer-events:none;
+    opacity:0;
+    transform:rotate(18deg) translateX(-140%);
+    background:linear-gradient(90deg,transparent,rgba(var(--fx-accent),.12),transparent);
+}
+.nav-item.fx-nav-sweep::after{animation:navSweep .62s ease-out;}
+
+/* Page-change depth, still quick enough to feel like a tool */
+.page.active.fx-page-in{
+    animation:fxPageIn .34s cubic-bezier(.18,.75,.25,1);
+}
+
+/* Clickable chips / tags have a playful but mature response */
+.tag,.var-chip,.filter-btn,.preset-btn{position:relative;overflow:hidden;}
+.tag.fx-chip-pop,.var-chip.fx-chip-pop,.filter-btn.fx-chip-pop,.preset-btn.fx-chip-pop{
+    animation:chipPop .42s cubic-bezier(.2,.85,.3,1.25);
+}
+
+/* Table rows get a subtle scan on click */
+tbody tr{position:relative;}
+tbody tr.fx-row-hit{animation:rowHit .48s ease;}
+tbody tr.fx-row-hit td{
+    background:linear-gradient(90deg,rgba(var(--fx-accent),.065),transparent 68%);
+}
+
+/* Inputs feel more alive without changing behavior */
+.search-input,.form-input,.form-textarea,.form-select,.custom-input{
+    transition:border-color .18s ease,box-shadow .2s ease,background .18s ease,transform .18s ease;
+}
+.search-input:focus,.form-input:focus,.form-textarea:focus,.form-select:focus,.custom-input:focus{
+    transform:translateY(-1px);
+    box-shadow:0 0 0 3px rgba(var(--fx-ink),.055),0 8px 22px rgba(var(--fx-ink),.035);
+}
+
+/* Modal entrance feels native rather than abrupt */
+.modal-mask.show .modal{animation:modalSpring .34s cubic-bezier(.18,.82,.25,1.08);}
+.modal-mask.show{animation:maskFade .24s ease;}
+
+/* The upload zone now reacts to a click with a short inner pulse */
+.upload-zone.fx-upload-hit{animation:uploadHit .52s cubic-bezier(.16,.82,.25,1);}
+
+/* Stat values bounce delicately when their card is clicked */
+.stat-number.fx-number-bounce{animation:numberBounce .48s cubic-bezier(.2,.85,.3,1.25);}
+
+/* A tiny success sweep usable by any part of the app */
+.fx-success-sweep{
+    position:fixed;
+    left:50%;top:50%;
+    width:24px;height:24px;
+    margin:-12px;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:1599;
+    border:1px solid rgba(var(--fx-accent),.36);
+    animation:successSweep .72s ease-out forwards;
+}
+
+@keyframes siteRipple{
+    0%{opacity:.72;transform:scale(.45)}
+    65%{opacity:.25}
+    100%{opacity:0;transform:scale(5.7)}
+}
+@keyframes siteSpark{
+    0%{opacity:0;transform:translate(0,0) scale(.55)}
+    16%{opacity:.9}
+    100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(.95)}
+}
+@keyframes clickFlash{
+    from{opacity:.9;transform:scale(.8)}
+    to{opacity:0;transform:scale(2.2)}
+}
+@keyframes surfacePress{
+    0%,100%{transform:translateY(0) scale(1)}
+    42%{transform:translateY(1px) scale(.992)}
+    72%{transform:translateY(-1px) scale(1.002)}
+}
+@keyframes surfacePop{
+    0%{transform:translateY(0) scale(1)}
+    42%{transform:translateY(-4px) scale(1.008)}
+    100%{transform:translateY(0) scale(1)}
+}
+@keyframes buttonHit{
+    0%,100%{filter:none}
+    45%{filter:brightness(.96);box-shadow:0 0 0 5px rgba(var(--fx-accent),.07)}
+}
+@keyframes navSweep{
+    0%{opacity:0;transform:rotate(18deg) translateX(-150%)}
+    20%{opacity:1}
+    100%{opacity:0;transform:rotate(18deg) translateX(470%)}
+}
+@keyframes fxPageIn{
+    from{opacity:0;transform:translateY(8px) scale(.996);filter:blur(2px)}
+    to{opacity:1;transform:none;filter:none}
+}
+@keyframes chipPop{
+    0%,100%{transform:scale(1)}
+    45%{transform:scale(.94)}
+    72%{transform:scale(1.055)}
+}
+@keyframes rowHit{
+    0%,100%{transform:none}
+    45%{transform:translateX(2px)}
+}
+@keyframes modalSpring{
+    from{opacity:0;transform:translateY(10px) scale(.985)}
+    to{opacity:1;transform:none}
+}
+@keyframes maskFade{
+    from{background:rgba(15,23,42,0)}
+}
+@keyframes uploadHit{
+    0%,100%{transform:none}
+    38%{transform:scale(.994);box-shadow:inset 0 0 0 1px rgba(var(--fx-accent),.17)}
+    68%{transform:scale(1.001)}
+}
+@keyframes numberBounce{
+    0%,100%{transform:translateY(0) scale(1)}
+    42%{transform:translateY(-3px) scale(1.055)}
+    70%{transform:translateY(1px) scale(.985)}
+}
+@keyframes successSweep{
+    from{opacity:.65;transform:scale(.4)}
+    to{opacity:0;transform:scale(16)}
+}
+
+@media(hover:hover) and (pointer:fine){
+    .fx-surface.fx-tilt{
+        transition:transform .16s ease,box-shadow .24s ease,border-color .24s ease;
+    }
+}
+@media(max-width:800px){
+    .site-cursor-aura{display:none;}
+    .site-ripple{animation-duration:.52s;}
+}
+@media(prefers-reduced-motion:reduce){
+    .site-cursor-aura,.site-ripple,.site-spark,.site-click-flash,.fx-success-sweep{display:none!important;}
+    .fx-surface,.fx-magnetic,.page.active,.modal{animation:none!important;transform:none!important;}
+}
+
 </style>
-</head>
+<style id="monochrome-paw-theme">
+/* ===== Black / white interaction pass ===== */
+:root{
+    --primary:#000;
+    --primary-hover:#111;
+    --primary-light:#f4f4f4;
+    --bg:#f7f7f5;
+    --bg-elevated:#fff;
+    --card:#fff;
+    --text:#050505;
+    --sub:#555;
+    --muted:#777;
+    --border:#111;
+    --border-strong:#000;
+    --danger:#000;
+    --danger-bg:#fff;
+    --success:#000;
+    --success-bg:#fff;
+    --shadow:none;
+    --shadow-lg:0 18px 50px rgba(0,0,0,.18);
+
+    --dog-ink:#000;
+    --dog-soft:#fff;
+    --dog-accent:#000;
+    --dog-shadow:0 14px 34px rgba(0,0,0,.14);
+}
+body.dark{
+    --primary:#fff;
+    --primary-hover:#eee;
+    --primary-light:#171717;
+    --bg:#050505;
+    --bg-elevated:#090909;
+    --card:#0c0c0c;
+    --text:#fff;
+    --sub:#b7b7b7;
+    --muted:#888;
+    --border:#f4f4f4;
+    --border-strong:#fff;
+    --danger:#fff;
+    --danger-bg:#0c0c0c;
+    --success:#fff;
+    --success-bg:#0c0c0c;
+
+    /* Keep mascot itself white with black linework in both themes. */
+    --dog-ink:#000;
+    --dog-soft:#fff;
+    --dog-accent:#000;
+}
+
+.sidebar,.topbar,.card,.stat-card,.recent-item,.category-card,.naming-panel,
+.system-status,.rule-item,.info-box,.ocr-text,.search-input,.form-input,
+.form-textarea,.form-select,.custom-input,.preset-btn,.filter-btn,.icon-btn{
+    border-color:var(--border) !important;
+}
+.card,.stat-card,.recent-item,.category-card,.naming-panel,.system-status,.rule-item{
+    box-shadow:none !important;
+}
+.btn-primary{
+    background:var(--text) !important;
+    color:var(--card) !important;
+    border:1px solid var(--text) !important;
+}
+body.dark .btn-primary{background:#fff !important;color:#000 !important;border-color:#fff !important;}
+.btn-secondary,.btn-danger{
+    background:var(--card) !important;
+    color:var(--text) !important;
+    border:1px solid var(--border) !important;
+}
+.btn-danger:hover,.btn-secondary:hover{background:var(--text) !important;color:var(--card) !important;}
+body.dark .btn-danger:hover,body.dark .btn-secondary:hover{background:#fff !important;color:#000 !important;}
+.nav-item.active{
+    border:1px solid var(--border);
+    box-shadow:none !important;
+}
+.upload-zone{
+    border:1.5px dashed var(--border) !important;
+    background:var(--card) !important;
+}
+.upload-zone:hover,.upload-zone.dragover{
+    border-style:solid !important;
+    transform:translateY(-1px);
+    box-shadow:0 4px 0 var(--text);
+}
+.tag,.var-chip{
+    background:var(--card) !important;
+    color:var(--text) !important;
+    border:1px solid var(--border) !important;
+}
+.status-dot{
+    background:var(--text) !important;
+    box-shadow:none !important;
+}
+.progress{border:1px solid var(--border);background:var(--card) !important;}
+.progress-bar{background:var(--text) !important;}
+::selection{background:#000;color:#fff;}
+body.dark ::selection{background:#fff;color:#000;}
+
+/* Restrained tactile feedback; no glow, no color particles. */
+.btn,.icon-btn,.nav-item,.filter-btn,.preset-btn,.var-chip,.recent-item,.category-card,.stat-card{
+    transition:transform .14s ease, background .14s ease, color .14s ease, border-color .14s ease !important;
+}
+.btn:active,.icon-btn:active,.nav-item:active,.filter-btn:active,.preset-btn:active,.var-chip:active{
+    transform:translateY(1px) scale(.985) !important;
+}
+.recent-item:hover,.category-card:hover,.stat-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 3px 0 var(--text) !important;
+}
+
+/* Mascot: pure black and white with visible eyes. */
+.mascot-dock{filter:none !important;}
+.mascot-halo{
+    background:radial-gradient(ellipse,rgba(0,0,0,.13),rgba(0,0,0,0) 68%) !important;
+}
+body.dark .mascot-halo{
+    background:radial-gradient(ellipse,rgba(255,255,255,.14),rgba(255,255,255,0) 68%) !important;
+}
+.mascot-dog .dog-fill{fill:#fff !important;stroke:#000 !important;stroke-width:2.25 !important;}
+.mascot-dog .dog-line{stroke:#000 !important;stroke-width:2.25 !important;}
+.mascot-dog .dog-accent{fill:#000 !important;stroke:#000 !important;}
+.mascot-dog .dog-cheek{fill:#000 !important;}
+.mascot-dog .dog-eye-white{fill:#fff !important;stroke:#000 !important;stroke-width:1.4 !important;}
+.mascot-dog .dog-pupil{fill:#000 !important;stroke:none !important;}
+.mascot-dog .dog-eye-left{transform-origin:39.5px 46px;}
+.mascot-dog .dog-eye-right{transform-origin:60.5px 46px;}
+.mascot-bubble{
+    background:#fff !important;
+    color:#000 !important;
+    border:1.5px solid #000 !important;
+    box-shadow:4px 4px 0 #000 !important;
+    backdrop-filter:none !important;
+}
+.mascot-badge{
+    background:#000 !important;color:#fff !important;border-color:#fff !important;
+}
+
+/* Tiny paw stamp layer */
+.paw-fx-layer{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:1800;
+    overflow:hidden;
+}
+.paw-stamp{
+    position:fixed;
+    width:22px;
+    height:22px;
+    margin:-11px 0 0 -11px;
+    opacity:0;
+    color:#000;
+    transform:rotate(var(--paw-r,0deg)) scale(.55);
+    animation:pawStamp .62s cubic-bezier(.18,.72,.24,1) forwards;
+}
+body.dark .paw-stamp{color:#fff;}
+.paw-stamp .pad{
+    position:absolute;
+    left:6px;top:9px;
+    width:10px;height:9px;
+    background:currentColor;
+    border-radius:55% 55% 62% 62%;
+    transform:rotate(1deg);
+}
+.paw-stamp .toe{
+    position:absolute;
+    width:5px;height:6px;
+    background:currentColor;
+    border-radius:55% 55% 50% 50%;
+}
+.paw-stamp .t1{left:2px;top:5px;transform:rotate(-28deg)}
+.paw-stamp .t2{left:6px;top:1px;transform:rotate(-8deg)}
+.paw-stamp .t3{right:6px;top:1px;transform:rotate(8deg)}
+.paw-stamp .t4{right:2px;top:5px;transform:rotate(28deg)}
+@keyframes pawStamp{
+    0%{opacity:0;transform:rotate(var(--paw-r,0deg)) scale(.45) translateY(3px)}
+    22%{opacity:.92;transform:rotate(var(--paw-r,0deg)) scale(1.03) translateY(0)}
+    72%{opacity:.72}
+    100%{opacity:0;transform:rotate(var(--paw-r,0deg)) scale(.94) translateY(-7px)}
+}
+@media(prefers-reduced-motion:reduce){
+    .paw-stamp{animation-duration:.22s;}
+}
+</style>
+
+<style id="first-dog-compat-style">
+.mascot-dock{background:transparent !important;box-shadow:none !important;}
+.mascot-stage{display:flex;align-items:flex-end;justify-content:center;}
+.mascot-dog{width:112px;height:132px;display:block;overflow:visible;}
+.mascot-bubble{border-radius:16px !important;}
+</style></head>
 <body>
 <div class="app">
 <aside class="sidebar" id="sidebar">
-    <div class="logo"><div class="logo-icon">AI</div><div><div class="logo-text">智能资料库</div><div class="logo-small">免费视觉模型 · 文件识别</div></div></div>
-    <nav class="nav">
-        <button class="nav-item active" data-page="dashboard"><span class="nav-icon">🏠</span><span>首页</span></button>
-        <button class="nav-item" data-page="upload"><span class="nav-icon">📤</span><span>智能上传</span></button>
-        <button class="nav-item" data-page="library"><span class="nav-icon">📚</span><span>内容库</span></button>
-        <button class="nav-item" data-page="search"><span class="nav-icon">🔎</span><span>智能查询</span></button>
-        <button class="nav-item" data-page="category"><span class="nav-icon">🏷️</span><span>分类管理</span></button>
-        <button class="nav-item" data-page="statistics"><span class="nav-icon">📊</span><span>数据统计</span></button>
-    </nav>
-    <div class="sidebar-bottom"><div class="system-status"><span class="status-dot" id="statusDot"></span><span id="statusText">正在检测后端服务...</span></div></div>
+<div class="logo"><div class="logo-icon">库</div><div><div class="logo-text">智能资料库</div><div class="logo-small">文件识别与归档</div></div></div>
+<nav class="nav">
+<button class="nav-item active" data-page="dashboard"><span class="nav-icon">🏠</span><span>首页</span></button>
+<button class="nav-item" data-page="upload"><span class="nav-icon">📤</span><span>智能上传</span></button>
+<button class="nav-item" data-page="library"><span class="nav-icon">📚</span><span>内容库</span></button>
+<button class="nav-item" data-page="search"><span class="nav-icon">🔎</span><span>智能查询</span></button>
+<button class="nav-item" data-page="category"><span class="nav-icon">🏷️</span><span>分类管理</span></button>
+<button class="nav-item" data-page="statistics"><span class="nav-icon">📊</span><span>数据统计</span></button>
+</nav>
+<div class="sidebar-bottom"><div class="system-status"><span class="status-dot" id="statusDot"></span><span id="statusText">正在检测后端服务...</span></div></div>
 </aside>
 <main class="main">
-    <header class="topbar">
-        <div style="display:flex;align-items:center;gap:12px;"><button class="icon-btn mobile-menu" id="mobileMenu">☰</button><div class="page-title" id="pageTitle">智能资料库</div></div>
-        <div class="top-actions"><button class="icon-btn" id="themeBtn" title="切换主题">🌙</button></div>
-    </header>
-    <div class="content">
+<header class="topbar">
+<div style="display:flex;align-items:center;gap:12px;"><button class="icon-btn mobile-menu" id="mobileMenu">☰</button><div class="page-title" id="pageTitle">智能资料库</div></div>
+<div class="top-actions"><button class="icon-btn" id="themeBtn" title="切换主题">◐</button></div>
+</header>
+<div class="content">
 <section class="page active" id="page-dashboard">
-    <div class="welcome"><h1>智能文件识别中心</h1><p>上传图片，系统自动识别内容、提取字段并分类。</p></div>
-    <div class="stats">
-        <div class="stat-card"><div class="stat-top"><div class="stat-title">全部文件</div><div class="stat-icon">📁</div></div><div class="stat-number" id="statFiles">0</div></div>
-        <div class="stat-card"><div class="stat-top"><div class="stat-title">图片文件</div><div class="stat-icon">🖼️</div></div><div class="stat-number" id="statImages">0</div></div>
-        <div class="stat-card"><div class="stat-top"><div class="stat-title">已识别事件</div><div class="stat-icon">🧠</div></div><div class="stat-number" id="statEvents">0</div></div>
-        <div class="stat-card"><div class="stat-top"><div class="stat-title">分类数量</div><div class="stat-icon">🏷️</div></div><div class="stat-number" id="statCategories">0</div></div>
-    </div>
-    <div class="card" style="margin-bottom:20px;">
-        <div class="card-header"><div class="card-title">快速上传</div><button class="btn btn-primary" onclick="navigate('upload')">开始识别</button></div>
-        <div class="card-body">
-            <div class="upload-zone" id="dashboardUpload">
-                <div class="upload-icon">📤</div>
-                <h2>拖拽图片到这里</h2>
-                <p>系统将自动识别文字并提取结构化字段</p>
-                <div class="upload-types">支持 JPG · PNG · WEBP · BMP</div>
-                <div class="upload-buttons"><button class="btn btn-primary" onclick="event.stopPropagation();openFilePicker();">选择图片</button></div>
-            </div>
-        </div>
-    </div>
-    <div class="card"><div class="card-header"><div class="card-title">最近识别</div><button class="btn btn-secondary" onclick="navigate('library')">查看全部</button></div><div class="card-body"><div class="recent-grid" id="recentGrid"></div></div></div>
+<div class="welcome"><h1>智能文件识别中心</h1><p>上传图片，系统自动识别内容、提取字段并分类。</p></div>
+<div class="stats">
+<div class="stat-card"><div class="stat-top"><div class="stat-title">全部文件</div><div class="stat-icon">📁</div></div><div class="stat-number" id="statFiles">0</div></div>
+<div class="stat-card"><div class="stat-top"><div class="stat-title">图片文件</div><div class="stat-icon">🖼️</div></div><div class="stat-number" id="statImages">0</div></div>
+<div class="stat-card"><div class="stat-top"><div class="stat-title">已识别事件</div><div class="stat-icon">🧠</div></div><div class="stat-number" id="statEvents">0</div></div>
+<div class="stat-card"><div class="stat-top"><div class="stat-title">分类数量</div><div class="stat-icon">🏷️</div></div><div class="stat-number" id="statCategories">0</div></div>
+</div>
+<div class="card" style="margin-bottom:20px;">
+<div class="card-header"><div class="card-title">快速上传</div><button class="btn btn-primary" onclick="navigate('upload')">开始识别</button></div>
+<div class="card-body">
+<div class="upload-zone" id="dashboardUpload">
+<div class="upload-icon">📤</div>
+<h2>拖拽图片到这里</h2>
+<p>系统将自动识别文字并提取结构化字段</p>
+<div class="upload-types">支持 JPG · PNG · WEBP · BMP</div>
+<div class="upload-buttons"><button class="btn btn-primary" onclick="event.stopPropagation();openFilePicker();">选择图片</button></div>
+</div>
+</div>
+</div>
+<div class="card"><div class="card-header"><div class="card-title">最近识别</div><button class="btn btn-secondary" onclick="navigate('library')">查看全部</button></div><div class="card-body"><div class="recent-grid" id="recentGrid"></div></div></div>
 </section>
 <section class="page" id="page-upload">
-    <div class="welcome"><h1>智能上传</h1><p>可自定义命名规则，识别后按模板自动命名文件。</p></div>
-    <div class="card">
-        <div class="card-body">
-            <div class="upload-zone" id="mainUpload">
-                <div class="upload-icon">📂</div>
-                <h2>点击或拖拽上传图片</h2>
-                <p>支持 JPG / PNG / WEBP / BMP</p>
-                <div class="upload-types">识别后会自动按命名模板重命名文件</div>
-                <div class="upload-buttons"><button class="btn btn-primary" onclick="event.stopPropagation();openFilePicker();">选择图片</button></div>
-            </div>
-
-            <!-- ========= 命名规则面板 ========= -->
-            <div class="naming-panel">
-                <div class="naming-panel-header">
-                    <div class="naming-panel-title">📝 命名规则设置</div>
-                </div>
-
-                <div class="naming-preset-row">
-                    <button class="preset-btn" onclick="setNamingTemplate('{活动名称}')">活动名称</button>
-                    <button class="preset-btn" onclick="setNamingTemplate('{时间}')">时间</button>
-                    <button class="preset-btn" onclick="setNamingTemplate('{地点}')">地点</button>
-                    <button class="preset-btn" onclick="setNamingTemplate('{日期}_{活动名称}')">日期+活动名称</button>
-                    <button class="preset-btn" onclick="setNamingTemplate('{活动名称}-{时间}')">活动名称-时间</button>
-                    <button class="preset-btn" onclick="setNamingTemplate('{地点}-{分类}')">地点-分类</button>
-                    <button class="preset-btn" onclick="setNamingTemplate('{原文件名}')">原始文件名</button>
-                </div>
-
-                <div class="custom-input-row">
-                    <input
-                        class="custom-input"
-                        id="namingTemplate"
-                        placeholder="自定义模板，例如：{日期}_{活动名称}-{地点}"
-                    >
-                    <button class="btn btn-primary" onclick="applyNamingTemplate()">保存模板</button>
-                </div>
-
-                <div style="font-size:12px;color:var(--sub);margin-bottom:6px;">点击下方标签可快速插入变量：</div>
-                <div class="var-chips">
-                    <span class="var-chip" onclick="insertVar('{活动名称}')">{活动名称}</span>
-                    <span class="var-chip" onclick="insertVar('{时间}')">{时间}</span>
-                    <span class="var-chip" onclick="insertVar('{地点}')">{地点}</span>
-                    <span class="var-chip" onclick="insertVar('{主办单位}')">{主办单位}</span>
-                    <span class="var-chip" onclick="insertVar('{参与人员}')">{参与人员}</span>
-                    <span class="var-chip" onclick="insertVar('{分类}')">{分类}</span>
-                    <span class="var-chip" onclick="insertVar('{日期}')">{日期}</span>
-                    <span class="var-chip" onclick="insertVar('{时刻}')">{时刻}</span>
-                    <span class="var-chip" onclick="insertVar('{原文件名}')">{原文件名}</span>
-                </div>
-
-                <div class="naming-preview" id="namingPreview">
-                    当前模板：<b id="previewTemplate">{活动名称}</b><br>
+<div class="welcome"><h1>智能上传</h1><p>可自定义命名规则，识别后按模板自动命名文件。</p></div>
+<div class="card">
+<div class="card-body">
+<div class="upload-zone" id="mainUpload">
+<div class="upload-icon">📂</div>
+<h2>点击或拖拽上传图片</h2>
+<p>支持 JPG / PNG / WEBP / BMP</p>
+<div class="upload-types">识别后会自动按命名模板重命名文件</div>
+<div class="upload-buttons"><button class="btn btn-primary" onclick="event.stopPropagation();openFilePicker();">选择图片</button></div>
+</div>
+<!-- ========= 命名规则面板 ========= -->
+<div class="naming-panel">
+<div class="naming-panel-header">
+<div class="naming-panel-title">命名规则设置</div>
+</div>
+<div class="naming-preset-row">
+<button class="preset-btn" onclick="setNamingTemplate('{活动名称}')">活动名称</button>
+<button class="preset-btn" onclick="setNamingTemplate('{时间}')">时间</button>
+<button class="preset-btn" onclick="setNamingTemplate('{地点}')">地点</button>
+<button class="preset-btn" onclick="setNamingTemplate('{日期}_{活动名称}')">日期+活动名称</button>
+<button class="preset-btn" onclick="setNamingTemplate('{活动名称}-{时间}')">活动名称-时间</button>
+<button class="preset-btn" onclick="setNamingTemplate('{地点}-{分类}')">地点-分类</button>
+<button class="preset-btn" onclick="setNamingTemplate('{原文件名}')">原始文件名</button>
+</div>
+<div class="custom-input-row">
+<input class="custom-input" id="namingTemplate" placeholder="自定义模板，例如：{日期}_{活动名称}-{地点}"/>
+<button class="btn btn-primary" onclick="applyNamingTemplate()">保存模板</button>
+</div>
+<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">点击下方标签可快速插入变量：</div>
+<div class="var-chips">
+<span class="var-chip" onclick="insertVar('{活动名称}')">{活动名称}</span>
+<span class="var-chip" onclick="insertVar('{时间}')">{时间}</span>
+<span class="var-chip" onclick="insertVar('{地点}')">{地点}</span>
+<span class="var-chip" onclick="insertVar('{主办单位}')">{主办单位}</span>
+<span class="var-chip" onclick="insertVar('{参与人员}')">{参与人员}</span>
+<span class="var-chip" onclick="insertVar('{分类}')">{分类}</span>
+<span class="var-chip" onclick="insertVar('{日期}')">{日期}</span>
+<span class="var-chip" onclick="insertVar('{时刻}')">{时刻}</span>
+<span class="var-chip" onclick="insertVar('{原文件名}')">{原文件名}</span>
+</div>
+<div class="naming-preview" id="namingPreview">
+                    当前模板：<b id="previewTemplate">{活动名称}</b><br/>
                     示例效果：<b id="previewExample">漳浦红十字志愿服务.jpg</b>
-                </div>
-            </div>
-            <!-- ========= /命名规则面板 ========= -->
-
-            <div class="progress-box" id="progressBox"><div class="progress-text" id="progressText">正在准备...</div><div class="progress"><div class="progress-bar" id="progressBar"></div></div></div>
-        </div>
-    </div>
-    <input type="file" id="fileInput" multiple accept="image/*">
-    <div style="height:20px;"></div>
-    <div class="card"><div class="card-header"><div class="card-title">识别说明</div></div><div class="card-body"><div style="line-height:2;color:var(--sub);font-size:13px;">
-        <p>① 图片会压缩至 1280px 宽后上传，速度更快。</p>
-        <p>② 系统自动选择最快的免费模型，遇到限流或参数问题会自动切换平台。</p>
-        <p>③ 字段包括：活动名称、时间、地点、主办单位、参与人员。</p>
-        <p>④ <b>命名模板支持自定义</b>，用 <code>{字段名}</code> 组合任意字段。</p>
-        <p>⑤ 详情页支持图片<b>滚轮缩放、拖拽查看</b>。</p>
-        <p>⑥ ⚠️ 请勿上传身份证、银行卡等敏感文件。</p>
-    </div></div></div>
+</div>
+</div>
+<!-- ========= /命名规则面板 ========= -->
+<div class="progress-box" id="progressBox"><div class="progress-text" id="progressText">正在准备...</div><div class="progress"><div class="progress-bar" id="progressBar"></div></div></div>
+</div>
+</div>
+<input accept="image/*" id="fileInput" multiple="" type="file"/>
+<div style="height:20px;"></div>
+<div class="card"><div class="card-header"><div class="card-title">识别说明</div></div><div class="card-body"><div style="line-height:2;color:var(--sub);font-size:13px;">
+<p>① 图片会压缩至 1280px 宽后上传，速度更快。</p>
+<p>② 系统自动选择最快的免费模型，遇到限流或参数问题会自动切换平台。</p>
+<p>③ 字段包括：活动名称、时间、地点、主办单位、参与人员。</p>
+<p>④ <b>命名模板支持自定义</b>，用 <code>{字段名}</code> 组合任意字段。</p>
+<p>⑤ 详情页支持图片<b>滚轮缩放、拖拽查看</b>。</p>
+<p>⑥ 请勿上传身份证、银行卡等敏感文件。</p>
+</div></div></div>
 </section>
 <section class="page" id="page-library">
-    <div class="welcome"><h1>内容库</h1><p>所有识别过的文件和事件都保存在这里。</p></div>
-    <div class="card">
-        <div class="card-header"><div class="card-title">全部资料</div><button class="btn btn-danger" onclick="clearAllData()">清空数据</button></div>
-        <div class="card-body">
-            <div class="search-box"><input class="search-input" id="librarySearch" placeholder="搜索文件名、事件、地点、人物、关键词..."></div>
-            <div class="filter-row" id="libraryFilters"></div>
-            <div class="table-wrap"><table><thead><tr><th>文件</th><th>事件</th><th>分类</th><th>时间</th><th>地点</th><th>操作</th></tr></thead><tbody id="libraryTable"></tbody></table></div>
-        </div>
-    </div>
+<div class="welcome"><h1>内容库</h1><p>所有识别过的文件和事件都保存在这里。</p></div>
+<div class="card">
+<div class="card-header"><div class="card-title">全部资料</div><button class="btn btn-danger" onclick="clearAllData()">清空数据</button></div>
+<div class="card-body">
+<div class="search-box"><input class="search-input" id="librarySearch" placeholder="搜索文件名、事件、地点、人物、关键词..."/></div>
+<div class="filter-row" id="libraryFilters"></div>
+<div class="table-wrap"><table><thead><tr><th>文件</th><th>事件</th><th>分类</th><th>时间</th><th>地点</th><th>操作</th></tr></thead><tbody id="libraryTable"></tbody></table></div>
+</div>
+</div>
 </section>
 <section class="page" id="page-search">
-    <div class="welcome"><h1>智能查询</h1><p>输入关键词或自然语言，快速找到相关内容。</p></div>
-    <div class="card"><div class="card-body">
-        <div class="search-box"><input class="search-input" id="smartSearch" placeholder="例如：查询所有环保志愿活动..."><button class="btn btn-primary" onclick="smartSearch()">🔎 查询</button></div>
-        <div style="color:var(--sub);font-size:12px;margin-bottom:18px;">试试：“志愿活动” · “环保” · “2024年1月” · “漳州” · “社区活动”</div>
-        <div id="searchResult"></div>
-    </div></div>
+<div class="welcome"><h1>智能查询</h1><p>输入关键词或自然语言，快速找到相关内容。</p></div>
+<div class="card"><div class="card-body">
+<div class="search-box"><input class="search-input" id="smartSearch" placeholder="例如：查询所有环保志愿活动..."/><button class="btn btn-primary" onclick="smartSearch()">查询</button></div>
+<div style="color:var(--sub);font-size:12px;margin-bottom:18px;">试试：“志愿活动” · “环保” · “2024年1月” · “漳州” · “社区活动”</div>
+<div id="searchResult"></div>
+</div></div>
 </section>
 <section class="page" id="page-category">
-    <div class="welcome"><h1>分类管理</h1><p>根据自己的需求定义分类规则。</p></div>
-    <div class="category-grid" id="categoryGrid" style="margin-bottom:20px;"></div>
-    <div class="card"><div class="card-header"><div class="card-title">分类规则</div><button class="btn btn-primary" onclick="openRuleModal()">＋ 新建分类</button></div><div class="card-body"><div class="rule-list" id="ruleList"></div></div></div>
+<div class="welcome"><h1>分类管理</h1><p>根据自己的需求定义分类规则。</p></div>
+<div class="category-grid" id="categoryGrid" style="margin-bottom:20px;"></div>
+<div class="card"><div class="card-header"><div class="card-title">分类规则</div><button class="btn btn-primary" onclick="openRuleModal()">＋ 新建分类</button></div><div class="card-body"><div class="rule-list" id="ruleList"></div></div></div>
 </section>
 <section class="page" id="page-statistics">
-    <div class="welcome"><h1>数据统计</h1><p>查看资料库中的分类和事件分布。</p></div>
-    <div class="stats">
-        <div class="stat-card"><div class="stat-title">文件总数</div><div class="stat-number" id="stat2Files">0</div></div>
-        <div class="stat-card"><div class="stat-title">图片总数</div><div class="stat-number" id="stat2Images">0</div></div>
-        <div class="stat-card"><div class="stat-title">事件总数</div><div class="stat-number" id="stat2Events">0</div></div>
-        <div class="stat-card"><div class="stat-title">标签总数</div><div class="stat-number" id="stat2Tags">0</div></div>
-    </div>
-    <div class="card"><div class="card-header"><div class="card-title">分类统计</div></div><div class="card-body"><div id="statisticsList"></div></div></div>
+<div class="welcome"><h1>数据统计</h1><p>查看资料库中的分类和事件分布。</p></div>
+<div class="stats">
+<div class="stat-card"><div class="stat-title">文件总数</div><div class="stat-number" id="stat2Files">0</div></div>
+<div class="stat-card"><div class="stat-title">图片总数</div><div class="stat-number" id="stat2Images">0</div></div>
+<div class="stat-card"><div class="stat-title">事件总数</div><div class="stat-number" id="stat2Events">0</div></div>
+<div class="stat-card"><div class="stat-title">标签总数</div><div class="stat-number" id="stat2Tags">0</div></div>
+</div>
+<div class="card"><div class="card-header"><div class="card-title">分类统计</div></div><div class="card-body"><div id="statisticsList"></div></div></div>
 </section>
-    </div>
+</div>
 </main>
 </div>
 <div class="modal-mask" id="detailModal"><div class="modal" style="width:1000px;"><div class="modal-header"><h2>资料详情</h2><button class="modal-close" onclick="closeModal('detailModal')">×</button></div><div class="modal-body" id="detailContent"></div></div></div>
 <div class="modal-mask" id="editModal"><div class="modal"><div class="modal-header"><h2>编辑识别结果</h2><button class="modal-close" onclick="closeModal('editModal')">×</button></div><div class="modal-body">
-    <input type="hidden" id="editId">
-    <div class="form-group"><label class="form-label">文件名</label><input class="form-input" id="editName"></div>
-    <div class="form-group"><label class="form-label">事件名称</label><input class="form-input" id="editEvent"></div>
-    <div class="form-group"><label class="form-label">分类</label><select class="form-select" id="editCategory"></select></div>
-    <div class="form-group"><label class="form-label">时间</label><input class="form-input" id="editTime"></div>
-    <div class="form-group"><label class="form-label">地点</label><input class="form-input" id="editLocation"></div>
-    <div class="form-group"><label class="form-label">人物</label><input class="form-input" id="editPeople"></div>
-    <div class="form-group"><label class="form-label">标签</label><input class="form-input" id="editTags"></div>
-    <div class="form-group"><label class="form-label">识别文本</label><textarea class="form-textarea" id="editText"></textarea></div>
+<input id="editId" type="hidden"/>
+<div class="form-group"><label class="form-label">文件名</label><input class="form-input" id="editName"/></div>
+<div class="form-group"><label class="form-label">事件名称</label><input class="form-input" id="editEvent"/></div>
+<div class="form-group"><label class="form-label">分类</label><select class="form-select" id="editCategory"></select></div>
+<div class="form-group"><label class="form-label">时间</label><input class="form-input" id="editTime"/></div>
+<div class="form-group"><label class="form-label">地点</label><input class="form-input" id="editLocation"/></div>
+<div class="form-group"><label class="form-label">人物</label><input class="form-input" id="editPeople"/></div>
+<div class="form-group"><label class="form-label">标签</label><input class="form-input" id="editTags"/></div>
+<div class="form-group"><label class="form-label">识别文本</label><textarea class="form-textarea" id="editText"></textarea></div>
 </div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('editModal')">取消</button><button class="btn btn-primary" onclick="saveEdit()">保存</button></div></div></div>
 <div class="modal-mask" id="ruleModal"><div class="modal"><div class="modal-header"><h2 id="ruleModalTitle">新建分类</h2><button class="modal-close" onclick="closeModal('ruleModal')">×</button></div><div class="modal-body">
-    <input type="hidden" id="ruleEditIndex" value="-1">
-    <div class="form-group"><label class="form-label">分类名称</label><input class="form-input" id="ruleName" placeholder="例如：志愿活动"></div>
-    <div class="form-group"><label class="form-label">关键词</label><input class="form-input" id="ruleKeywords" placeholder="志愿,公益,服务,义工"><div style="font-size:11px;color:var(--sub);margin-top:5px;">多个关键词使用英文逗号或中文逗号分隔。</div></div>
+<input id="ruleEditIndex" type="hidden" value="-1"/>
+<div class="form-group"><label class="form-label">分类名称</label><input class="form-input" id="ruleName" placeholder="例如：志愿活动"/></div>
+<div class="form-group"><label class="form-label">关键词</label><input class="form-input" id="ruleKeywords" placeholder="志愿,公益,服务,义工"/><div style="font-size:11px;color:var(--sub);margin-top:5px;">多个关键词使用英文逗号或中文逗号分隔。</div></div>
 </div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('ruleModal')">取消</button><button class="btn btn-primary" onclick="saveRule()">保存</button></div></div></div>
+<!-- Interactive mascot: visual-only layer, safe to remove without affecting app -->
+<div aria-label="互动小狗" class="mascot-dock" id="mascotDock" role="button" tabindex="0">
+<div class="mascot-bubble" id="mascotBubble">我在这儿。</div>
+<div class="mascot-badge" id="mascotBadge">0</div>
+<div class="mascot-stage">
+<div class="mascot-halo"></div>
+<svg aria-hidden="true" class="mascot-dog" viewbox="0 0 100 110">
+<!-- tail -->
+<path class="dog-line dog-tail" d="M77 76 C92 71, 91 59, 83 58 C78 58, 79 64, 84 65"></path>
+<!-- body -->
+<path class="dog-fill" d="M30 65 C27 75, 27 89, 35 96 C42 103, 66 102, 73 94 C79 87, 77 74, 70 66 C60 58, 40 58, 30 65 Z"></path>
+<!-- rear legs -->
+<path class="dog-line" d="M67 89 C69 94, 68 100, 64 102"></path>
+<path class="dog-line" d="M37 89 C34 95, 35 100, 39 102"></path>
+<!-- chest -->
+<path class="dog-line" d="M47 70 C45 81, 46 91, 49 97"></path>
+<path class="dog-line" d="M57 70 C59 81, 58 91, 55 97"></path>
+<!-- paws -->
+<path class="dog-line dog-paw" d="M44 101 C47 103, 51 103, 53 101"></path>
+<path class="dog-line dog-paw" d="M54 101 C58 103, 62 103, 64 101"></path>
+<!-- head group -->
+<g class="dog-head">
+<!-- ears -->
+<path class="dog-fill dog-ear-left" d="M31 35 C20 31, 18 19, 24 14 C31 17, 36 24, 37 34 Z"></path>
+<path class="dog-fill dog-ear-right" d="M69 35 C80 31, 82 19, 76 14 C69 17, 64 24, 63 34 Z"></path>
+<!-- head -->
+<path class="dog-fill" d="M31 30 C38 22, 61 22, 69 30 C76 38, 75 54, 68 62 C61 70, 39 70, 32 62 C25 54, 24 39, 31 30 Z"></path>
+<!-- forehead detail -->
+<path class="dog-line" d="M50 25 C47 31, 47 35, 50 38 C53 35, 53 31, 50 25 Z" opacity=".28"></path>
+<!-- eyes -->
+<ellipse class="dog-eye" cx="39.5" cy="46" rx="2.2" ry="2.8"></ellipse>
+<ellipse class="dog-eye" cx="60.5" cy="46" rx="2.2" ry="2.8"></ellipse>
+<!-- cheeks -->
+<ellipse class="dog-cheek" cx="34" cy="54.5" rx="4.2" ry="2.1"></ellipse>
+<ellipse class="dog-cheek" cx="66" cy="54.5" rx="4.2" ry="2.1"></ellipse>
+<!-- muzzle -->
+<path class="dog-line" d="M42 54 C43 61, 57 61, 58 54"></path>
+<path class="dog-accent" d="M46.5 52 C48 50.5, 52 50.5, 53.5 52 C53 55, 51.4 56.2, 50 56.2 C48.6 56.2, 47 55, 46.5 52 Z"></path>
+<path class="dog-line dog-mouth-neutral" d="M50 56 L50 60"></path>
+<path class="dog-line dog-mouth-happy" d="M44 59 C47 63, 53 63, 56 59"></path>
+<!-- collar -->
+<path class="dog-line" d="M34 64 C42 67, 58 67, 66 64"></path>
+<circle class="dog-accent" cx="50" cy="67" r="2.8"></circle>
+</g>
+</svg>
+<div class="mascot-particles" id="mascotParticles"></div>
+</div>
+<div class="mascot-hint">拖动我 · 点一点</div>
+</div>
 <div class="toast" id="toast"></div>
 <script>
 const API_ENDPOINT = '/api/ocr';
@@ -531,8 +1896,20 @@ async function handleFiles(fileList) {
     navigate("upload");
     const files = Array.from(fileList).filter(f => f.type.startsWith("image/"));
     if (files.length === 0) { showToast("请上传图片文件"); return; }
-    for (let i = 0; i < files.length; i++) { await processFile(files[i], i, files.length); }
-    updateDashboard(); renderLibrary(); showToast("全部文件处理完成");
+    mascot.start(files.length === 1 ? files[0].name : `${files.length} 个文件`);
+    let failedCount = 0;
+    for (let i = 0; i < files.length; i++) {
+        const ok = await processFile(files[i], i, files.length);
+        if (!ok) failedCount++;
+    }
+    updateDashboard(); renderLibrary();
+    if (failedCount === 0) {
+        showToast("全部文件处理完成");
+        mascot.complete(files.length > 1 ? `${files.length} 个文件都处理好了` : "");
+    } else {
+        showToast(`${files.length - failedCount} 个完成，${failedCount} 个失败`);
+        mascot.fail();
+    }
 }
 
 async function processFile(file, index, total) {
@@ -543,10 +1920,12 @@ async function processFile(file, index, total) {
     progressText.textContent = `正在处理 ${index+1}/${total}：${file.name}`;
     progressBar.style.width = ((index)/total*100) + "%";
     try {
-        progressText.textContent = `📦 正在压缩图片 (${index+1}/${total})...`;
+        progressText.textContent = `正在压缩图片 (${index+1}/${total})...`;
+        mascot.progress('compress');
         const base64 = await compressToBase64(file, 1280, 0.75);
         progressBar.style.width = ((index + 0.3)/total*100) + "%";
-        progressText.textContent = `📤 正在上传并识别 (${index+1}/${total})...`;
+        progressText.textContent = `正在上传并识别 (${index+1}/${total})...`;
+        mascot.progress('recognize');
         const resp = await fetch(API_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ imageBase64: base64, mode: 'structured' }) });
         if (!resp.ok) { const errData = await resp.json().catch(() => ({})); throw new Error(errData.error || `HTTP ${resp.status}`); }
         const data = await resp.json();
@@ -573,6 +1952,7 @@ async function processFile(file, index, total) {
 
         const ext = (file.name.match(/\.[^/.]+$/) || ['.jpg'])[0];
         const finalName = baseName + ext;
+        mascot.progress('save');
 
         const record = {
             id: Date.now().toString() + Math.random().toString(36).substring(2),
@@ -593,9 +1973,15 @@ async function processFile(file, index, total) {
         };
         record.imageData = await compressToBase64(file, 1200, 0.8);
         documents.unshift(record); saveDocuments();
-        progressBar.style.width = "100%"; progressText.textContent = `✓ 已识别并命名为：${finalName}`;
+        progressBar.style.width = "100%"; progressText.textContent = `已识别并命名为：${finalName}`;
         await sleep(500);
-    } catch (error) { console.error(error); progressText.textContent = `处理失败：${file.name} - ${error.message}`; showToast(`处理失败：${error.message}`); }
+        return true;
+    } catch (error) {
+        console.error(error);
+        progressText.textContent = `处理失败：${file.name} - ${error.message}`;
+        showToast(`处理失败：${error.message}`);
+        return false;
+    }
 }
 
 function parseGLMResponse(raw) {
@@ -732,7 +2118,7 @@ function showDetail(id) {
     const content = document.getElementById("detailContent");
     let viewerHTML = '';
     if (d.imageData) {
-        viewerHTML = `<div class="image-viewer" id="imageViewer"><div class="viewer-hint">🖱 滚轮缩放 · 拖拽平移 · 双击重置</div><img src="data:image/jpeg;base64,${d.imageData}" alt="预览"><div class="viewer-toolbar"><button onclick="zoomOut()" title="缩小">−</button><button onclick="resetViewer()" title="重置">⟲</button><button onclick="zoomIn()" title="放大">＋</button></div></div>`;
+        viewerHTML = `<div class="image-viewer" id="imageViewer"><div class="viewer-hint">滚轮缩放 · 拖拽平移 · 双击重置</div><img src="data:image/jpeg;base64,${d.imageData}" alt="预览"><div class="viewer-toolbar"><button onclick="zoomOut()" title="缩小">−</button><button onclick="resetViewer()" title="重置">⟲</button><button onclick="zoomIn()" title="放大">＋</button></div></div>`;
     } else {
         viewerHTML = `<div class="preview-fallback">${getFileIcon(d)}<br><br>暂无图片预览</div>`;
     }
@@ -815,23 +2201,321 @@ function renderStatistics() {
     const count = {}; documents.forEach(d => { count[d.category] = (count[d.category] || 0) + 1; }); const total = documents.length;
     container.innerHTML = Object.entries(count).sort((a, b) => b[1] - a[1]).map(([name, num]) => { const percent = Math.round(num / total * 100); return `<div style="margin-bottom:18px;"><div style="display:flex;justify-content:space-between;margin-bottom:7px;font-size:13px;"><span>${getCategoryIcon(name)} ${escapeHTML(name)}</span><span>${num} / ${percent}%</span></div><div style="height:8px;background:var(--border);border-radius:20px;overflow:hidden;"><div style="width:${percent}%;height:100%;background:var(--primary);border-radius:20px;"></div></div></div>`; }).join("");
 }
+
+/* =========================================
+   Interactive mascot · Office Dog
+   All state is isolated from document data.
+========================================= */
+const mascot = (() => {
+    const dock = document.getElementById('mascotDock');
+    const bubble = document.getElementById('mascotBubble');
+    const badge = document.getElementById('mascotBadge');
+    const particles = document.getElementById('mascotParticles');
+    if (!dock || !bubble) return { start(){}, progress(){}, complete(){}, fail(){}, say(){} };
+
+    let petCount = Number(localStorage.getItem('smart_dog_pet_count') || 0);
+    let bubbleTimer = null;
+    let sleepyTimer = null;
+    let dragging = false;
+    let moved = false;
+    let startX = 0, startY = 0, baseX = 0, baseY = 0;
+    let offsetX = Number(localStorage.getItem('smart_dog_x') || 0);
+    let offsetY = Number(localStorage.getItem('smart_dog_y') || 0);
+    let working = false;
+
+    const idleLines = [
+        '摸到我了。',
+        '我没有偷看文件内容。',
+        '今天也要把资料收拾整齐。',
+        '再点一下，我可能会更开心。',
+        '我负责陪伴，识别交给系统。',
+        '这边一切正常。'
+    ];
+    const workLines = [
+        '正在闻文件里的线索…',
+        '我盯着进度条，你可以摸我。',
+        '图片正在处理，我先陪你等。',
+        '正在把信息一条条找出来。',
+        '快了。我尾巴已经开始加速。'
+    ];
+    const doneLines = [
+        '识别完成。漂亮。',
+        '搞定，文件已经归队。',
+        '完成！这次我也有功劳吧。',
+        '资料收好啦。'
+    ];
+
+    function clampPosition() {
+        const r = dock.getBoundingClientRect();
+        const currentLeft = r.left - offsetX;
+        const currentTop = r.top - offsetY;
+        const nextLeft = currentLeft + offsetX;
+        const nextTop = currentTop + offsetY;
+        const minLeft = 6, minTop = 70;
+        const maxLeft = window.innerWidth - r.width - 6;
+        const maxTop = window.innerHeight - r.height - 6;
+        if (nextLeft < minLeft) offsetX += minLeft - nextLeft;
+        if (nextLeft > maxLeft) offsetX -= nextLeft - maxLeft;
+        if (nextTop < minTop) offsetY += minTop - nextTop;
+        if (nextTop > maxTop) offsetY -= nextTop - maxTop;
+        applyPosition();
+    }
+
+    function applyPosition() {
+        dock.style.translate = `${offsetX}px ${offsetY}px`;
+    }
+
+    function persistPosition() {
+        localStorage.setItem('smart_dog_x', Math.round(offsetX));
+        localStorage.setItem('smart_dog_y', Math.round(offsetY));
+    }
+
+    function say(text, duration = 2200) {
+        if (!text) return;
+        bubble.textContent = text;
+        bubble.classList.add('show');
+        clearTimeout(bubbleTimer);
+        bubbleTimer = setTimeout(() => bubble.classList.remove('show'), duration);
+    }
+
+    function updateBadge() {
+        if (petCount <= 0) return badge.classList.remove('show');
+        badge.textContent = petCount > 99 ? '99+' : String(petCount);
+        badge.classList.add('show');
+    }
+
+    function react() {
+        if (dragging || moved) return;
+        petCount += 1;
+        localStorage.setItem('smart_dog_pet_count', petCount);
+        updateBadge();
+        dock.classList.remove('reaction');
+        void dock.offsetWidth;
+        dock.classList.add('reaction');
+        setTimeout(() => dock.classList.remove('reaction'), 560);
+
+        let line;
+        if (petCount === 1) line = '你好。你发现我了。';
+        else if (petCount === 5) line = '第五次了，我们算熟人了。';
+        else if (petCount === 10) line = '十连摸达成。';
+        else if (petCount === 20) line = '20 次。你是不是忘了我还会被拖走？';
+        else line = (working ? workLines : idleLines)[Math.floor(Math.random() * (working ? workLines.length : idleLines.length))];
+        say(line, 2100);
+        scheduleSleep();
+    }
+
+    function scheduleSleep() {
+        clearTimeout(sleepyTimer);
+        dock.classList.remove('sleepy');
+        if (working) return;
+        sleepyTimer = setTimeout(() => {
+            if (!working && !dragging) {
+                dock.classList.add('sleepy');
+                say('我先眯一会儿。', 1700);
+            }
+        }, 16000);
+    }
+
+    function wake() {
+        dock.classList.remove('sleepy');
+        scheduleSleep();
+    }
+
+    function burst(count = 12) {
+        if (!particles) return;
+        particles.innerHTML = '';
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < count; i++) {
+            const p = document.createElement('i');
+            p.className = 'mascot-particle';
+            const a = (Math.PI * 2 * i / count) + (Math.random() - .5) * .28;
+            const dist = 34 + Math.random() * 46;
+            p.style.setProperty('--px', `${Math.cos(a) * dist}px`);
+            p.style.setProperty('--py', `${Math.sin(a) * dist - 12}px`);
+            p.style.setProperty('--pr', `${(Math.random() * 180 - 90).toFixed(0)}deg`);
+            p.style.animationDelay = `${Math.random() * .08}s`;
+            frag.appendChild(p);
+        }
+        particles.appendChild(frag);
+        requestAnimationFrame(() => particles.querySelectorAll('.mascot-particle').forEach(p => p.classList.add('pop')));
+        setTimeout(() => { if (particles) particles.innerHTML = ''; }, 1100);
+    }
+
+    function start(label = '') {
+        working = true;
+        wake();
+        dock.classList.remove('celebrate','sleepy');
+        dock.classList.add('working');
+        say(label ? `收到 ${label}，我陪你等。` : workLines[0], 2400);
+    }
+
+    function progress(stage) {
+        if (!working) start();
+        if (stage === 'compress') say('先把图片整理轻一点。', 1500);
+        if (stage === 'recognize') say(workLines[Math.floor(Math.random()*workLines.length)], 1900);
+        if (stage === 'save') say('最后整理一下文件名。', 1500);
+    }
+
+    function complete(name = '') {
+        working = false;
+        if (typeof window.siteSuccessFX === 'function') window.siteSuccessFX(window.innerWidth - 78, window.innerHeight - 92);
+        dock.classList.remove('working','sleepy','reaction');
+        void dock.offsetWidth;
+        dock.classList.add('celebrate');
+        burst(14);
+        say(name ? `完成：${name}` : doneLines[Math.floor(Math.random()*doneLines.length)], 3000);
+        setTimeout(() => {
+            dock.classList.remove('celebrate');
+            scheduleSleep();
+        }, 1650);
+    }
+
+    function fail() {
+        working = false;
+        dock.classList.remove('working','celebrate');
+        say('这次没成功，我还在这儿。', 2800);
+        scheduleSleep();
+    }
+
+    dock.addEventListener('pointerdown', e => {
+        if (e.button !== undefined && e.button !== 0) return;
+        dragging = true;
+        moved = false;
+        startX = e.clientX; startY = e.clientY;
+        baseX = offsetX; baseY = offsetY;
+        dock.classList.add('dragging');
+        dock.setPointerCapture?.(e.pointerId);
+        wake();
+    });
+
+    dock.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const dx = e.clientX - startX, dy = e.clientY - startY;
+        if (Math.hypot(dx, dy) > 4) moved = true;
+        if (!moved) return;
+        offsetX = baseX + dx;
+        offsetY = baseY + dy;
+        applyPosition();
+    });
+
+    function endDrag(e) {
+        if (!dragging) return;
+        dragging = false;
+        dock.classList.remove('dragging');
+        dock.releasePointerCapture?.(e.pointerId);
+        if (moved) {
+            clampPosition();
+            persistPosition();
+            say('新位置不错。', 1200);
+        }
+        setTimeout(() => { moved = false; }, 0);
+    }
+    dock.addEventListener('pointerup', endDrag);
+    dock.addEventListener('pointercancel', endDrag);
+    dock.addEventListener('click', () => react());
+    dock.addEventListener('mouseenter', wake);
+    dock.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            react();
+        }
+    });
+    window.addEventListener('resize', clampPosition);
+
+    applyPosition();
+    requestAnimationFrame(clampPosition);
+    updateBadge();
+    scheduleSleep();
+    setTimeout(() => say('需要等识别的时候，可以点我玩。', 3000), 1100);
+
+    return { start, progress, complete, fail, say };
+})();
+
 document.getElementById("smartSearch").addEventListener("keydown", e => { if (e.key === "Enter") smartSearch(); });
 document.getElementById("librarySearch").addEventListener("input", () => renderLibrary());
-document.getElementById("themeBtn").addEventListener("click", () => { document.body.classList.toggle("dark"); const dark = document.body.classList.contains("dark"); localStorage.setItem("smart_dark_mode", dark); document.getElementById("themeBtn").textContent = dark ? "☀️" : "🌙"; });
-function loadTheme() { const dark = localStorage.getItem("smart_dark_mode") === "true"; if (dark) { document.body.classList.add("dark"); document.getElementById("themeBtn").textContent = "☀️"; } }
+document.getElementById("themeBtn").addEventListener("click", () => { document.body.classList.toggle("dark"); const dark = document.body.classList.contains("dark"); localStorage.setItem("smart_dark_mode", dark); document.getElementById("themeBtn").textContent = dark ? "◑" : "◐"; });
+function loadTheme() { const dark = localStorage.getItem("smart_dark_mode") === "true"; if (dark) { document.body.classList.add("dark"); document.getElementById("themeBtn").textContent = "◑"; } }
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 function formatSize(bytes) { if (!bytes) return "0 B"; const units = ["B", "KB", "MB", "GB"]; let i = 0, size = bytes; while (size >= 1024 && i < units.length - 1) { size /= 1024; i++; } return size.toFixed(i === 0 ? 0 : 1) + " " + units[i]; }
 function formatDate(date) { if (!date) return "--"; const d = new Date(date); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
-function getFileIcon(d) { if (d.type && d.type.startsWith("image/")) return "🖼️"; return "📄"; }
-function getCategoryIcon(name) { const map = { "志愿活动": "🤝", "环保活动": "🌱", "会议": "💼", "学习培训": "📚", "体育活动": "🏃", "文艺活动": "🎭", "公益活动": "❤️", "其他": "📁" }; return map[name] || "🏷️"; }
+function getFileIcon(d) { if (d.type && d.type.startsWith("image/")) return "▧"; return "□"; }
+function getCategoryIcon(name) { const map = { "志愿活动": "◇", "环保活动": "◇", "会议": "◇", "学习培训": "◇", "体育活动": "◇", "文艺活动": "◇", "公益活动": "◇", "其他": "◇" }; return map[name] || "◇"; }
 function escapeHTML(value) { if (value === null || value === undefined) return ""; return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 function escapeAttr(value) { return escapeHTML(value); }
 function showToast(message) { const toast = document.getElementById("toast"); toast.textContent = message; toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 2500); }
 async function checkBackend() {
     const dot = document.getElementById("statusDot"); const text = document.getElementById("statusText");
-    try { const resp = await fetch('/api/health'); const data = await resp.json(); if (data.ok && (data.hasZhipuKey || data.hasSiliconflowKey)) { dot.style.background = "var(--success)"; text.textContent = "双平台服务已连接"; } else { dot.style.background = "#f59e0b"; text.textContent = "缺少 API Key 配置"; } } catch (e) { dot.style.background = "#ef4444"; text.textContent = "无法连接后端服务"; }
+    try { const resp = await fetch('/api/health'); const data = await resp.json(); if (data.ok && (data.hasZhipuKey || data.hasSiliconflowKey)) { dot.style.background = "var(--text)"; text.textContent = "双平台服务已连接"; } else { dot.style.background = "var(--text)"; text.textContent = "缺少 API Key 配置"; } } catch (e) { dot.style.background = "var(--text)"; text.textContent = "无法连接后端服务"; }
 }
 loadTheme(); initNamingPanel(); updateDashboard(); renderLibrary(); renderCategories(); renderStatistics(); checkBackend();
 </script>
+<script id="paw-click-interaction">
+(() => {
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let layer = document.querySelector('.paw-fx-layer');
+    if (layer) layer.remove();
+    layer = document.createElement('div');
+    layer.className = 'paw-fx-layer';
+    layer.setAttribute('aria-hidden','true');
+    document.body.appendChild(layer);
+
+    function createPawEl(x, y, rotation = (Math.random()*34-17), sizeClass = '') {
+        const el = document.createElement('span');
+        el.className = 'paw-stamp ' + sizeClass;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.style.setProperty('--paw-r', rotation.toFixed(1) + 'deg');
+        el.innerHTML = '<i class="toe t1"></i><i class="toe t2"></i><i class="toe t3"></i><i class="toe t4"></i><b class="pad"></b>';
+        layer.appendChild(el);
+        setTimeout(() => el.remove(), reduceMotion ? 260 : 700);
+    }
+
+    function singlePaw(x, y){
+        const sizes = ['', 'small', 'tiny'];
+        createPawEl(x, y, Math.random()*36-18, sizes[Math.floor(Math.random()*sizes.length)]);
+    }
+
+    function triplePaws(x, y){
+        const offsets = [
+            {dx:(Math.random()*18-20), dy:(Math.random()*14-12), s:''},
+            {dx:(Math.random()*16+4), dy:(Math.random()*10-5), s:'small'},
+            {dx:(Math.random()*20-6), dy:(Math.random()*18+6), s:'tiny'},
+        ];
+        offsets.forEach((o, i) => {
+            setTimeout(() => createPawEl(x + o.dx, y + o.dy, Math.random()*44-22, o.s), reduceMotion ? 0 : i*40);
+        });
+    }
+
+    function isSideClick(x, y){
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const sideX = vw * 0.24;
+        const sideY = vh * 0.22;
+        return x < sideX || x > (vw - sideX) || y < sideY || y > (vh - sideY);
+    }
+
+    document.addEventListener('click', e => {
+        if (e.button !== undefined && e.button !== 0) return;
+        if (e.target.closest('input,textarea,select,[contenteditable="true"]')) return;
+        const x = e.clientX;
+        const y = e.clientY;
+        if (isSideClick(x, y)) {
+            triplePaws(x, y);
+        } else {
+            singlePaw(x, y);
+        }
+    }, {passive:true});
+
+    window.siteSuccessFX = function(x = innerWidth/2, y = innerHeight/2){
+        const trail = [
+            [-20, 8, -18], [2, -4, 12], [24, 10, -14]
+        ];
+        trail.forEach(([dx,dy,r], i) => {
+            setTimeout(() => createPawEl(x+dx, y+dy, r, i === 1 ? 'small' : ''), reduceMotion ? 0 : i*55);
+        });
+    };
+})();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"7939e04a4baf43c8b86a560f74aac60e","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
