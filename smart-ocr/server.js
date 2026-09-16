@@ -19,24 +19,32 @@ app.get('/api/health', (req, res) => {
 });
 
 async function callVisionModel(modelName, base64Data, prompt) {
+    // 基础请求体
+    const requestBody = {
+        model: modelName,
+        messages: [{
+            role: 'user',
+            content: [
+                { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64Data}` } },
+                { type: 'text', text: prompt }
+            ]
+        }]
+    };
+
+    // glm-4v-flash 不支持 max_tokens / temperature 等参数，传了会返回 400
+    // 其他模型可以保留这两个参数
+    if (modelName !== 'glm-4v-flash') {
+        requestBody.max_tokens = 1500;
+        requestBody.temperature = 0.1;
+    }
+
     const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${ZHIPU_API_KEY}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            model: modelName,
-            messages: [{
-                role: 'user',
-                content: [
-                    { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64Data}` } },
-                    { type: 'text', text: prompt }
-                ]
-            }],
-            max_tokens: 1500,
-            temperature: 0.1
-        })
+        body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
@@ -73,21 +81,33 @@ app.post('/api/ocr', async (req, res) => {
         try {
             console.log(`尝试使用免费模型: ${modelName}`);
             const result = await callVisionModel(modelName, base64Data, prompt);
+            console.log(`模型 ${modelName} 识别成功`);
             return res.json({ text: result.text, usage: result.usage, model: result.model });
         } catch (err) {
             lastError = err;
+            // 429 限流 → 自动切换下一个模型
             if (err.status === 429) {
                 console.warn(`模型 ${modelName} 限流，降级到下一个免费模型`);
                 continue;
             }
+            // 401/403 Key 问题 → 直接返回
             if (err.status === 401 || err.status === 403) {
                 return res.status(err.status).json({ error: `API Key 无效或未授权（${err.status}）`, detail: err.detail });
             }
+            // 400 参数问题 → 也尝试降级（有些模型对参数敏感）
+            if (err.status === 400) {
+                console.warn(`模型 ${modelName} 返回 400 参数错误，尝试下一个模型`);
+                continue;
+            }
+            // 其他错误 → 直接返回
             return res.status(err.status).json({ error: `模型 ${modelName} 调用失败（${err.status}）`, detail: err.detail });
         }
     }
 
-    return res.status(429).json({ error: '所有免费视觉模型均被限流，请稍后重试' });
+    return res.status(429).json({
+        error: '所有免费视觉模型均不可用，请稍后重试',
+        detail: lastError?.detail
+    });
 });
 
 app.listen(PORT, () => {
