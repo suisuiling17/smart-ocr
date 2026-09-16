@@ -103,66 +103,14 @@ tbody tr:hover{background:var(--bg);}
 .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--primary);}
 .modal-footer{padding:15px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
 .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-/* ========= 图片缩放查看器 ========= */
-.image-viewer{
-    background:#1e293b;
-    border-radius:12px;
-    min-height:420px;
-    position:relative;
-    overflow:hidden;
-    cursor:grab;
-    user-select:none;
-}
+.image-viewer{background:#1e293b;border-radius:12px;min-height:420px;position:relative;overflow:hidden;cursor:grab;user-select:none;}
 .image-viewer:active{cursor:grabbing;}
-.image-viewer img{
-    position:absolute;
-    top:0;left:0;
-    transform-origin:0 0;
-    transition:transform .05s linear;
-    pointer-events:none;
-    max-width:none;
-}
-.viewer-toolbar{
-    position:absolute;
-    bottom:12px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    gap:6px;
-    background:rgba(0,0,0,.65);
-    padding:6px 10px;
-    border-radius:20px;
-    z-index:10;
-}
-.viewer-toolbar button{
-    background:rgba(255,255,255,.15);
-    color:#fff;
-    border:0;
-    border-radius:6px;
-    padding:5px 10px;
-    cursor:pointer;
-    font-size:14px;
-    font-weight:600;
-}
+.image-viewer img{position:absolute;top:0;left:0;transform-origin:0 0;transition:transform .05s linear;pointer-events:none;max-width:none;}
+.viewer-toolbar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:rgba(0,0,0,.65);padding:6px 10px;border-radius:20px;z-index:10;}
+.viewer-toolbar button{background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:14px;font-weight:600;}
 .viewer-toolbar button:hover{background:rgba(255,255,255,.3);}
-.viewer-hint{
-    position:absolute;
-    top:10px;
-    left:10px;
-    background:rgba(0,0,0,.55);
-    color:#fff;
-    padding:5px 10px;
-    border-radius:8px;
-    font-size:11px;
-    z-index:10;
-}
-.preview-fallback{
-    background:var(--bg);
-    border-radius:12px;
-    min-height:420px;
-    display:flex;justify-content:center;align-items:center;
-    color:var(--sub);text-align:center;padding:40px;
-}
+.viewer-hint{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;padding:5px 10px;border-radius:8px;font-size:11px;z-index:10;}
+.preview-fallback{background:var(--bg);border-radius:12px;min-height:420px;display:flex;justify-content:center;align-items:center;color:var(--sub);text-align:center;padding:40px;}
 .detail-section{margin-bottom:20px;}
 .detail-section h3{font-size:14px;margin-bottom:10px;}
 .info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
@@ -177,33 +125,88 @@ tbody tr:hover{background:var(--bg);}
 .progress-bar{height:100%;width:0;background:var(--primary);transition:.2s;}
 .toast{position:fixed;right:25px;bottom:25px;background:#172033;color:#fff;padding:13px 17px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transform:translateY(20px);transition:.25s;z-index:1000;}
 .toast.show{opacity:1;transform:translateY(0);}
-/* 命名规则选择器 */
-.naming-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
+/* ========= 命名规则面板 ========= */
+.naming-panel{
     margin-top:15px;
-    padding:12px 15px;
+    padding:16px 18px;
     background:var(--card);
     border:1px solid var(--border);
     border-radius:12px;
-    flex-wrap:wrap;
 }
-.naming-row label{font-size:13px;font-weight:600;color:var(--sub);}
-.naming-select{
-    padding:8px 12px;
+.naming-panel-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+    gap:10px;
+}
+.naming-panel-title{font-size:14px;font-weight:700;}
+.naming-preset-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+}
+.preset-btn{
+    padding:6px 12px;
+    border-radius:20px;
     border:1px solid var(--border);
-    border-radius:8px;
+    background:var(--bg);
+    color:var(--sub);
+    cursor:pointer;
+    font-size:12px;
+    transition:.2s;
+}
+.preset-btn:hover{background:var(--primary-light);color:var(--primary);border-color:#93c5fd;}
+.custom-input-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:10px;
+}
+.custom-input{
+    flex:1;
+    padding:10px 12px;
+    border:1px solid var(--border);
+    border-radius:9px;
     background:var(--card);
     color:var(--text);
+    font-family:'Consolas','Monaco',monospace;
     font-size:13px;
     outline:none;
-    cursor:pointer;
 }
-.naming-select:focus{border-color:var(--primary);}
+.custom-input:focus{border-color:var(--primary);}
+.var-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:8px;
+}
+.var-chip{
+    padding:4px 9px;
+    background:var(--primary-light);
+    color:var(--primary);
+    border-radius:6px;
+    font-size:11px;
+    cursor:pointer;
+    font-family:'Consolas','Monaco',monospace;
+    border:1px solid transparent;
+    transition:.15s;
+}
+.var-chip:hover{background:var(--primary);color:#fff;}
+.naming-preview{
+    margin-top:10px;
+    padding:8px 12px;
+    background:var(--bg);
+    border-radius:8px;
+    font-size:12px;
+    color:var(--sub);
+    word-break:break-all;
+}
+.naming-preview b{color:var(--primary);}
 @media(max-width:1100px){.stats{grid-template-columns:repeat(2,1fr);}.category-grid{grid-template-columns:repeat(2,1fr);}.recent-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:800px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.main{margin-left:0;width:100%;}.mobile-menu{display:block;}.topbar{padding:0 15px;}.content{padding:18px;}.stats{grid-template-columns:1fr 1fr;gap:10px;}.recent-grid{grid-template-columns:1fr;}.category-grid{grid-template-columns:1fr 1fr;}.detail-grid{grid-template-columns:1fr;}}
-@media(max-width:500px){.stats{grid-template-columns:1fr;}.category-grid{grid-template-columns:1fr;}.welcome h1{font-size:23px;}.upload-zone{padding:40px 15px;}.info-grid{grid-template-columns:1fr;}}
+@media(max-width:500px){.stats{grid-template-columns:1fr;}.category-grid{grid-template-columns:1fr;}.welcome h1{font-size:23px;}.upload-zone{padding:40px 15px;}.info-grid{grid-template-columns:1fr;}.custom-input-row{flex-direction:column;}}
 </style>
 </head>
 <body>
@@ -249,28 +252,62 @@ tbody tr:hover{background:var(--bg);}
     <div class="card"><div class="card-header"><div class="card-title">最近识别</div><button class="btn btn-secondary" onclick="navigate('library')">查看全部</button></div><div class="card-body"><div class="recent-grid" id="recentGrid"></div></div></div>
 </section>
 <section class="page" id="page-upload">
-    <div class="welcome"><h1>智能上传</h1><p>可选择命名规则，识别后按规则自动命名文件。</p></div>
+    <div class="welcome"><h1>智能上传</h1><p>可自定义命名规则，识别后按模板自动命名文件。</p></div>
     <div class="card">
         <div class="card-body">
             <div class="upload-zone" id="mainUpload">
                 <div class="upload-icon">📂</div>
                 <h2>点击或拖拽上传图片</h2>
                 <p>支持 JPG / PNG / WEBP / BMP</p>
-                <div class="upload-types">识别后会自动按规则重命名文件</div>
+                <div class="upload-types">识别后会自动按命名模板重命名文件</div>
                 <div class="upload-buttons"><button class="btn btn-primary" onclick="event.stopPropagation();openFilePicker();">选择图片</button></div>
             </div>
-            <div class="naming-row">
-                <label>📝 命名规则：</label>
-                <select class="naming-select" id="namingRule">
-                    <option value="auto">自动（活动名称优先）</option>
-                    <option value="event">活动名称</option>
-                    <option value="time">时间</option>
-                    <option value="location">地点</option>
-                    <option value="datetime">识别日期+原文件名</option>
-                    <option value="original">保留原始文件名</option>
-                </select>
-                <span style="font-size:12px;color:var(--sub);">识别完成后按此规则命名</span>
+
+            <!-- ========= 命名规则面板 ========= -->
+            <div class="naming-panel">
+                <div class="naming-panel-header">
+                    <div class="naming-panel-title">📝 命名规则设置</div>
+                </div>
+
+                <div class="naming-preset-row">
+                    <button class="preset-btn" onclick="setNamingTemplate('{活动名称}')">活动名称</button>
+                    <button class="preset-btn" onclick="setNamingTemplate('{时间}')">时间</button>
+                    <button class="preset-btn" onclick="setNamingTemplate('{地点}')">地点</button>
+                    <button class="preset-btn" onclick="setNamingTemplate('{日期}_{活动名称}')">日期+活动名称</button>
+                    <button class="preset-btn" onclick="setNamingTemplate('{活动名称}-{时间}')">活动名称-时间</button>
+                    <button class="preset-btn" onclick="setNamingTemplate('{地点}-{分类}')">地点-分类</button>
+                    <button class="preset-btn" onclick="setNamingTemplate('{原文件名}')">原始文件名</button>
+                </div>
+
+                <div class="custom-input-row">
+                    <input
+                        class="custom-input"
+                        id="namingTemplate"
+                        placeholder="自定义模板，例如：{日期}_{活动名称}-{地点}"
+                    >
+                    <button class="btn btn-primary" onclick="applyNamingTemplate()">保存模板</button>
+                </div>
+
+                <div style="font-size:12px;color:var(--sub);margin-bottom:6px;">点击下方标签可快速插入变量：</div>
+                <div class="var-chips">
+                    <span class="var-chip" onclick="insertVar('{活动名称}')">{活动名称}</span>
+                    <span class="var-chip" onclick="insertVar('{时间}')">{时间}</span>
+                    <span class="var-chip" onclick="insertVar('{地点}')">{地点}</span>
+                    <span class="var-chip" onclick="insertVar('{主办单位}')">{主办单位}</span>
+                    <span class="var-chip" onclick="insertVar('{参与人员}')">{参与人员}</span>
+                    <span class="var-chip" onclick="insertVar('{分类}')">{分类}</span>
+                    <span class="var-chip" onclick="insertVar('{日期}')">{日期}</span>
+                    <span class="var-chip" onclick="insertVar('{时刻}')">{时刻}</span>
+                    <span class="var-chip" onclick="insertVar('{原文件名}')">{原文件名}</span>
+                </div>
+
+                <div class="naming-preview" id="namingPreview">
+                    当前模板：<b id="previewTemplate">{活动名称}</b><br>
+                    示例效果：<b id="previewExample">漳浦红十字志愿服务.jpg</b>
+                </div>
             </div>
+            <!-- ========= /命名规则面板 ========= -->
+
             <div class="progress-box" id="progressBox"><div class="progress-text" id="progressText">正在准备...</div><div class="progress"><div class="progress-bar" id="progressBar"></div></div></div>
         </div>
     </div>
@@ -280,7 +317,7 @@ tbody tr:hover{background:var(--bg);}
         <p>① 图片会压缩至 1280px 宽后上传，速度更快。</p>
         <p>② 系统自动选择最快的免费模型，遇到限流或参数问题会自动切换平台。</p>
         <p>③ 字段包括：活动名称、时间、地点、主办单位、参与人员。</p>
-        <p>④ <b>可选择命名规则</b>，识别完成后自动重命名。</p>
+        <p>④ <b>命名模板支持自定义</b>，用 <code>{字段名}</code> 组合任意字段。</p>
         <p>⑤ 详情页支持图片<b>滚轮缩放、拖拽查看</b>。</p>
         <p>⑥ ⚠️ 请勿上传身份证、银行卡等敏感文件。</p>
     </div></div></div>
@@ -343,7 +380,9 @@ tbody tr:hover{background:var(--bg);}
 <script>
 const API_ENDPOINT = '/api/ocr';
 const STORAGE_KEY = 'smart_document_database_v2';
-const NAMING_KEY = 'smart_naming_rule';
+const NAMING_KEY = 'smart_naming_template';
+const DEFAULT_TEMPLATE = '{活动名称}';
+
 const DEFAULT_RULES = [
     { name: "志愿活动", keywords: ["志愿","志愿者","公益","义工","服务","志愿服务"] },
     { name: "环保活动", keywords: ["环保","垃圾","清洁","绿化","植树","环境保护"] },
@@ -357,7 +396,7 @@ const DEFAULT_RULES = [
 let rules = loadRules();
 let documents = loadDocuments();
 let currentFilter = "全部";
-let namingRule = localStorage.getItem(NAMING_KEY) || 'auto';
+let namingTemplate = localStorage.getItem(NAMING_KEY) || DEFAULT_TEMPLATE;
 
 function loadRules() { try { const data = localStorage.getItem("smart_rules"); if (data) return JSON.parse(data); } catch(e) {} return DEFAULT_RULES; }
 function saveRules() { localStorage.setItem("smart_rules", JSON.stringify(rules)); }
@@ -381,50 +420,110 @@ function setupDropZone(element) {
 setupDropZone(document.getElementById("dashboardUpload"));
 setupDropZone(document.getElementById("mainUpload"));
 
-// 命名规则持久化
-const namingSelect = document.getElementById("namingRule");
-namingSelect.value = namingRule;
-namingSelect.addEventListener("change", () => {
-    namingRule = namingSelect.value;
-    localStorage.setItem(NAMING_KEY, namingRule);
-    showToast("命名规则已切换：" + namingSelect.options[namingSelect.selectedIndex].text);
-});
+/* =========================================
+   命名模板管理
+========================================= */
+function initNamingPanel() {
+    const input = document.getElementById("namingTemplate");
+    input.value = namingTemplate;
+    updateNamingPreview();
+    input.addEventListener("input", updateNamingPreview);
+}
+
+function setNamingTemplate(tpl) {
+    namingTemplate = tpl;
+    document.getElementById("namingTemplate").value = tpl;
+    localStorage.setItem(NAMING_KEY, tpl);
+    updateNamingPreview();
+    showToast("已应用模板：" + tpl);
+}
+
+function applyNamingTemplate() {
+    const val = document.getElementById("namingTemplate").value.trim() || DEFAULT_TEMPLATE;
+    namingTemplate = val;
+    localStorage.setItem(NAMING_KEY, val);
+    updateNamingPreview();
+    showToast("模板已保存");
+}
+
+function insertVar(v) {
+    const input = document.getElementById("namingTemplate");
+    const start = input.selectionStart || input.value.length;
+    const end = input.selectionEnd || input.value.length;
+    input.value = input.value.substring(0, start) + v + input.value.substring(end);
+    input.focus();
+    input.setSelectionRange(start + v.length, start + v.length);
+    updateNamingPreview();
+}
+
+function updateNamingPreview() {
+    const tpl = document.getElementById("namingTemplate").value || DEFAULT_TEMPLATE;
+    const example = tpl
+        .replace(/\{活动名称\}/g, "漳浦红十字志愿服务")
+        .replace(/\{event\}/g, "漳浦红十字志愿服务")
+        .replace(/\{时间\}/g, "2024年1月29日")
+        .replace(/\{time\}/g, "2024年1月29日")
+        .replace(/\{地点\}/g, "漳浦县")
+        .replace(/\{location\}/g, "漳浦县")
+        .replace(/\{主办单位\}/g, "漳州职业技术学院")
+        .replace(/\{org\}/g, "漳州职业技术学院")
+        .replace(/\{参与人员\}/g, "余琳")
+        .replace(/\{people\}/g, "余琳")
+        .replace(/\{分类\}/g, "志愿活动")
+        .replace(/\{category\}/g, "志愿活动")
+        .replace(/\{日期\}/g, "20240916")
+        .replace(/\{date\}/g, "20240916")
+        .replace(/\{时刻\}/g, "1430")
+        .replace(/\{clock\}/g, "1430")
+        .replace(/\{原文件名\}/g, "调试图片")
+        .replace(/\{original\}/g, "调试图片");
+    document.getElementById("previewTemplate").textContent = tpl;
+    document.getElementById("previewExample").textContent = example + ".jpg";
+}
 
 /**
- * 根据命名规则生成文件名
+ * 应用模板，把占位符替换成真实字段值
  */
-function buildFileName(rule, parsed, analysis, originalName) {
-    const ext = (originalName.match(/\.[^/.]+$/) || ['.jpg'])[0];
-    const safe = (s) => (s || '').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').trim().substring(0, 60);
+function renderNamingTemplate(tpl, data) {
     const now = new Date();
-    const dateStr = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
-    const timeStr = String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
-    const originalBase = originalName.replace(/\.[^/.]+$/, '');
+    const pad = n => String(n).padStart(2, '0');
+    const dateStr = now.getFullYear() + pad(now.getMonth()+1) + pad(now.getDate());
+    const timeStr = pad(now.getHours()) + pad(now.getMinutes());
 
-    let base = '';
-    switch (rule) {
-        case 'event':
-            base = parsed.活动名称 || analysis.event || originalBase;
-            break;
-        case 'time':
-            base = parsed.时间 || analysis.time || dateStr;
-            break;
-        case 'location':
-            base = parsed.地点 || analysis.location || originalBase;
-            break;
-        case 'datetime':
-            base = dateStr + '_' + timeStr + '_' + originalBase;
-            break;
-        case 'original':
-            return originalName; // 保留原文件名（带扩展名）
-        case 'auto':
-        default:
-            base = parsed.活动名称 || analysis.event || originalBase;
-            break;
-    }
+    const map = {
+        '活动名称': data.event || '',
+        'event': data.event || '',
+        '时间': data.time || '',
+        'time': data.time || '',
+        '地点': data.location || '',
+        'location': data.location || '',
+        '主办单位': data.org || '',
+        'org': data.org || '',
+        '参与人员': data.people || '',
+        'people': data.people || '',
+        '分类': data.category || '',
+        'category': data.category || '',
+        '日期': dateStr,
+        'date': dateStr,
+        '时刻': timeStr,
+        'clock': timeStr,
+        '原文件名': data.original || '',
+        'original': data.original || ''
+    };
 
-    base = safe(base) || '未命名';
-    return base + ext;
+    let result = tpl.replace(/\{([^}]+)\}/g, (match, key) => {
+        const v = map[key.trim()];
+        return v !== undefined && v !== '' ? v : '';
+    });
+
+    // 清理空段和多余分隔符
+    result = result
+        .replace(/[-_\s]+$|^[-_\s]+/g, '')
+        .replace(/([-_])\1+/g, '$1')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    return result;
 }
 
 async function handleFiles(fileList) {
@@ -455,8 +554,25 @@ async function processFile(file, index, total) {
         const parsed = parseGLMResponse(data.text);
         const analysis = analyzeContent(parsed.全文 || data.text, file.name);
 
-        // 根据当前命名规则生成文件名
-        const finalName = buildFileName(namingRule, parsed, analysis, file.name);
+        // 用模板渲染文件名
+        const originalBase = file.name.replace(/\.[^/.]+$/, '');
+        const dataForTemplate = {
+            event: parsed.活动名称 || analysis.event || '',
+            time: parsed.时间 || analysis.time || '',
+            location: parsed.地点 || analysis.location || '',
+            org: parsed.主办单位 || '',
+            people: cleanPeople(parsed.参与人员 || analysis.people || ''),
+            category: analysis.category || '',
+            original: originalBase
+        };
+        let baseName = renderNamingTemplate(namingTemplate, dataForTemplate);
+        // 如果模板渲染结果为空，回退到原文件名
+        if (!baseName) baseName = originalBase;
+        // 安全化文件名
+        baseName = baseName.replace(/[\\/:*?"<>|]/g, '_').substring(0, 80) || '未命名';
+
+        const ext = (file.name.match(/\.[^/.]+$/) || ['.jpg'])[0];
+        const finalName = baseName + ext;
 
         const record = {
             id: Date.now().toString() + Math.random().toString(36).substring(2),
@@ -465,7 +581,7 @@ async function processFile(file, index, total) {
             type: file.type || "unknown",
             size: file.size,
             createdAt: new Date().toISOString(),
-            namingRule: namingRule,
+            namingTemplate: namingTemplate,
             text: parsed.全文 || data.text,
             event: parsed.活动名称 || analysis.event,
             category: analysis.category,
@@ -572,243 +688,79 @@ function setFilter(filter) { currentFilter = filter; renderLibrary(); }
 function smartSearch() { const query = document.getElementById("smartSearch").value.trim().toLowerCase(); if (!query) { showToast("请输入查询内容"); return; } const cleaned = query.replace(/查询|查找|搜索|所有|全部|资料|记录|信息/g, " ").trim(); const keywords = cleaned.split(/\s+|，|,|、/).filter(Boolean); const result = documents.filter(d => { const text = [d.name, d.originalName, d.event, d.category, d.time, d.location, d.people, d.text, ...(d.tags || [])].join(" ").toLowerCase(); if (!keywords.length) return text.includes(query); return keywords.some(k => text.includes(k)); }); renderSearchResults(result, query); }
 function renderSearchResults(result, query) { const container = document.getElementById("searchResult"); if (!result.length) { container.innerHTML = `<div class="empty">没有找到与 <b>${escapeHTML(query)}</b> 相关的内容。</div>`; return; } container.innerHTML = `<div style="margin-bottom:15px;color:var(--sub);font-size:13px;">找到 <b style="color:var(--primary);">${result.length}</b> 条相关记录</div><div class="table-wrap"><table><thead><tr><th>文件</th><th>事件</th><th>分类</th><th>时间</th><th>地点</th><th>操作</th></tr></thead><tbody>${result.map(d => `<tr><td>${escapeHTML(d.name)}</td><td>${escapeHTML(d.event)}</td><td><span class="tag">${escapeHTML(d.category)}</span></td><td>${escapeHTML(d.time)}</td><td>${escapeHTML(d.location)}</td><td><button class="btn btn-secondary" onclick="showDetail('${d.id}')">查看</button></td></tr>`).join("")}</tbody></table></div>`; }
 
-/* =========================================
-   图片缩放查看器
-========================================= */
-let viewerState = {
-    scale: 1,
-    tx: 0,
-    ty: 0,
-    dragging: false,
-    lastX: 0,
-    lastY: 0,
-    img: null,
-    naturalW: 0,
-    naturalH: 0,
-    viewerW: 0,
-    viewerH: 0
-};
-
+/* 图片缩放查看器 */
+let viewerState = { scale: 1, tx: 0, ty: 0, dragging: false, lastX: 0, lastY: 0, img: null, naturalW: 0, naturalH: 0, viewerW: 0, viewerH: 0 };
 function initImageViewer() {
     const viewer = document.getElementById("imageViewer");
     if (!viewer) return;
     const img = viewer.querySelector("img");
     if (!img) return;
-
-    viewerState = {
-        scale: 1, tx: 0, ty: 0,
-        dragging: false, lastX: 0, lastY: 0,
-        img: img, naturalW: 0, naturalH: 0,
-        viewerW: 0, viewerH: 0
-    };
-
-    // 图片加载完成后，计算初始缩放（适配容器）
+    viewerState = { scale: 1, tx: 0, ty: 0, dragging: false, lastX: 0, lastY: 0, img: img, naturalW: 0, naturalH: 0, viewerW: 0, viewerH: 0 };
     const fitImage = () => {
         const rect = viewer.getBoundingClientRect();
-        viewerState.viewerW = rect.width;
-        viewerState.viewerH = rect.height;
-        viewerState.naturalW = img.naturalWidth;
-        viewerState.naturalH = img.naturalHeight;
+        viewerState.viewerW = rect.width; viewerState.viewerH = rect.height;
+        viewerState.naturalW = img.naturalWidth; viewerState.naturalH = img.naturalHeight;
         if (!viewerState.naturalW) return;
-        // 初始缩放：适配容器宽度
         const scaleX = rect.width / viewerState.naturalW;
         const scaleY = rect.height / viewerState.naturalH;
         const fitScale = Math.min(scaleX, scaleY, 1);
         viewerState.scale = fitScale;
-        // 居中
         viewerState.tx = (rect.width - viewerState.naturalW * fitScale) / 2;
         viewerState.ty = (rect.height - viewerState.naturalH * fitScale) / 2;
         applyTransform();
     };
-
-    if (img.complete && img.naturalWidth) {
-        fitImage();
-    } else {
-        img.addEventListener("load", fitImage);
-    }
-
-    // 滚轮缩放
-    viewer.addEventListener("wheel", (e) => {
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? -0.15 : 0.15;
-        zoomAt(e.offsetX, e.offsetY, delta);
-    }, { passive: false });
-
-    // 拖拽平移
-    viewer.addEventListener("mousedown", (e) => {
-        if (e.target.closest(".viewer-toolbar")) return;
-        viewerState.dragging = true;
-        viewerState.lastX = e.clientX;
-        viewerState.lastY = e.clientY;
-    });
-    window.addEventListener("mousemove", (e) => {
-        if (!viewerState.dragging) return;
-        const dx = e.clientX - viewerState.lastX;
-        const dy = e.clientY - viewerState.lastY;
-        viewerState.tx += dx;
-        viewerState.ty += dy;
-        viewerState.lastX = e.clientX;
-        viewerState.lastY = e.clientY;
-        applyTransform();
-    });
-    window.addEventListener("mouseup", () => {
-        viewerState.dragging = false;
-    });
-
-    // 双击重置
-    viewer.addEventListener("dblclick", () => {
-        resetViewer();
-    });
-
-    // 触摸支持（手机）
+    if (img.complete && img.naturalWidth) { fitImage(); } else { img.addEventListener("load", fitImage); }
+    viewer.addEventListener("wheel", (e) => { e.preventDefault(); const delta = e.deltaY > 0 ? -0.15 : 0.15; zoomAt(e.offsetX, e.offsetY, delta); }, { passive: false });
+    viewer.addEventListener("mousedown", (e) => { if (e.target.closest(".viewer-toolbar")) return; viewerState.dragging = true; viewerState.lastX = e.clientX; viewerState.lastY = e.clientY; });
+    window.addEventListener("mousemove", (e) => { if (!viewerState.dragging) return; const dx = e.clientX - viewerState.lastX; const dy = e.clientY - viewerState.lastY; viewerState.tx += dx; viewerState.ty += dy; viewerState.lastX = e.clientX; viewerState.lastY = e.clientY; applyTransform(); });
+    window.addEventListener("mouseup", () => { viewerState.dragging = false; });
+    viewer.addEventListener("dblclick", () => { resetViewer(); });
     let touchDist = 0;
-    viewer.addEventListener("touchstart", (e) => {
-        if (e.touches.length === 1) {
-            viewerState.dragging = true;
-            viewerState.lastX = e.touches[0].clientX;
-            viewerState.lastY = e.touches[0].clientY;
-        } else if (e.touches.length === 2) {
-            const dx = e.touches[0].clientX - e.touches[1].clientX;
-            const dy = e.touches[0].clientY - e.touches[1].clientY;
-            touchDist = Math.sqrt(dx*dx + dy*dy);
-        }
-    }, { passive: true });
-    viewer.addEventListener("touchmove", (e) => {
-        if (e.touches.length === 1 && viewerState.dragging) {
-            const dx = e.touches[0].clientX - viewerState.lastX;
-            const dy = e.touches[0].clientY - viewerState.lastY;
-            viewerState.tx += dx;
-            viewerState.ty += dy;
-            viewerState.lastX = e.touches[0].clientX;
-            viewerState.lastY = e.touches[0].clientY;
-            applyTransform();
-        } else if (e.touches.length === 2) {
-            const dx = e.touches[0].clientX - e.touches[1].clientX;
-            const dy = e.touches[0].clientY - e.touches[1].clientY;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            if (touchDist) {
-                const delta = (dist - touchDist) / 200;
-                zoomAt(viewerState.viewerW/2, viewerState.viewerH/2, delta);
-            }
-            touchDist = dist;
-        }
-    }, { passive: true });
-    viewer.addEventListener("touchend", () => {
-        viewerState.dragging = false;
-        touchDist = 0;
-    });
+    viewer.addEventListener("touchstart", (e) => { if (e.touches.length === 1) { viewerState.dragging = true; viewerState.lastX = e.touches[0].clientX; viewerState.lastY = e.touches[0].clientY; } else if (e.touches.length === 2) { const dx = e.touches[0].clientX - e.touches[1].clientX; const dy = e.touches[0].clientY - e.touches[1].clientY; touchDist = Math.sqrt(dx*dx + dy*dy); } }, { passive: true });
+    viewer.addEventListener("touchmove", (e) => { if (e.touches.length === 1 && viewerState.dragging) { const dx = e.touches[0].clientX - viewerState.lastX; const dy = e.touches[0].clientY - viewerState.lastY; viewerState.tx += dx; viewerState.ty += dy; viewerState.lastX = e.touches[0].clientX; viewerState.lastY = e.touches[0].clientY; applyTransform(); } else if (e.touches.length === 2) { const dx = e.touches[0].clientX - e.touches[1].clientX; const dy = e.touches[0].clientY - e.touches[1].clientY; const dist = Math.sqrt(dx*dx + dy*dy); if (touchDist) { const delta = (dist - touchDist) / 200; zoomAt(viewerState.viewerW/2, viewerState.viewerH/2, delta); } touchDist = dist; } }, { passive: true });
+    viewer.addEventListener("touchend", () => { viewerState.dragging = false; touchDist = 0; });
 }
-
-function applyTransform() {
-    if (!viewerState.img) return;
-    viewerState.img.style.transform = `translate(${viewerState.tx}px, ${viewerState.ty}px) scale(${viewerState.scale})`;
-}
-
-function zoomAt(cx, cy, delta) {
-    const oldScale = viewerState.scale;
-    let newScale = oldScale * (1 + delta);
-    newScale = Math.max(0.1, Math.min(newScale, 8));
-    // 以光标为中心缩放
-    const ratio = newScale / oldScale;
-    viewerState.tx = cx - (cx - viewerState.tx) * ratio;
-    viewerState.ty = cy - (cy - viewerState.ty) * ratio;
-    viewerState.scale = newScale;
-    applyTransform();
-}
-
+function applyTransform() { if (!viewerState.img) return; viewerState.img.style.transform = `translate(${viewerState.tx}px, ${viewerState.ty}px) scale(${viewerState.scale})`; }
+function zoomAt(cx, cy, delta) { const oldScale = viewerState.scale; let newScale = oldScale * (1 + delta); newScale = Math.max(0.1, Math.min(newScale, 8)); const ratio = newScale / oldScale; viewerState.tx = cx - (cx - viewerState.tx) * ratio; viewerState.ty = cy - (cy - viewerState.ty) * ratio; viewerState.scale = newScale; applyTransform(); }
 function zoomIn() { zoomAt(viewerState.viewerW/2, viewerState.viewerH/2, 0.2); }
 function zoomOut() { zoomAt(viewerState.viewerW/2, viewerState.viewerH/2, -0.2); }
-function resetViewer() {
-    if (!viewerState.img || !viewerState.naturalW) return;
-    const rect = document.getElementById("imageViewer").getBoundingClientRect();
-    const scaleX = rect.width / viewerState.naturalW;
-    const scaleY = rect.height / viewerState.naturalH;
-    const fitScale = Math.min(scaleX, scaleY, 1);
-    viewerState.scale = fitScale;
-    viewerState.tx = (rect.width - viewerState.naturalW * fitScale) / 2;
-    viewerState.ty = (rect.height - viewerState.naturalH * fitScale) / 2;
-    applyTransform();
-}
+function resetViewer() { if (!viewerState.img || !viewerState.naturalW) return; const rect = document.getElementById("imageViewer").getBoundingClientRect(); const scaleX = rect.width / viewerState.naturalW; const scaleY = rect.height / viewerState.naturalH; const fitScale = Math.min(scaleX, scaleY, 1); viewerState.scale = fitScale; viewerState.tx = (rect.width - viewerState.naturalW * fitScale) / 2; viewerState.ty = (rect.height - viewerState.naturalH * fitScale) / 2; applyTransform(); }
 
-/* =========================================
-   详情
-========================================= */
 function showDetail(id) {
     const d = documents.find(x => x.id === id);
     if (!d) return;
     const content = document.getElementById("detailContent");
     let viewerHTML = '';
     if (d.imageData) {
-        viewerHTML = `
-            <div class="image-viewer" id="imageViewer">
-                <div class="viewer-hint">🖱 滚轮缩放 · 拖拽平移 · 双击重置</div>
-                <img src="data:image/jpeg;base64,${d.imageData}" alt="预览">
-                <div class="viewer-toolbar">
-                    <button onclick="zoomOut()" title="缩小">−</button>
-                    <button onclick="resetViewer()" title="重置">⟲</button>
-                    <button onclick="zoomIn()" title="放大">＋</button>
-                </div>
-            </div>`;
+        viewerHTML = `<div class="image-viewer" id="imageViewer"><div class="viewer-hint">🖱 滚轮缩放 · 拖拽平移 · 双击重置</div><img src="data:image/jpeg;base64,${d.imageData}" alt="预览"><div class="viewer-toolbar"><button onclick="zoomOut()" title="缩小">−</button><button onclick="resetViewer()" title="重置">⟲</button><button onclick="zoomIn()" title="放大">＋</button></div></div>`;
     } else {
         viewerHTML = `<div class="preview-fallback">${getFileIcon(d)}<br><br>暂无图片预览</div>`;
     }
-
-    const ruleLabels = {
-        auto: '自动（活动名称优先）',
-        event: '活动名称',
-        time: '时间',
-        location: '地点',
-        datetime: '识别日期+原文件名',
-        original: '保留原始文件名'
-    };
-
     content.innerHTML = `
         <div class="detail-grid">
+            <div>${viewerHTML}<div style="margin-top:10px;text-align:center;"><button class="btn btn-secondary" onclick="editDocument('${d.id}')">编辑识别结果</button></div></div>
             <div>
-                ${viewerHTML}
-                <div style="margin-top:10px;text-align:center;">
-                    <button class="btn btn-secondary" onclick="editDocument('${d.id}')">编辑识别结果</button>
-                </div>
+                <div class="detail-section"><h3>事件信息</h3><div class="info-grid">
+                    <div class="info-box"><label>事件</label><span>${escapeHTML(d.event)}</span></div>
+                    <div class="info-box"><label>分类</label><span>${escapeHTML(d.category)}</span></div>
+                    <div class="info-box"><label>时间</label><span>${escapeHTML(d.time)}</span></div>
+                    <div class="info-box"><label>地点</label><span>${escapeHTML(d.location)}</span></div>
+                    <div class="info-box" style="grid-column:1/-1;"><label>人物/单位</label><span>${escapeHTML(d.people)}</span></div>
+                </div></div>
+                <div class="detail-section"><h3>标签</h3><div>${(d.tags || []).map(t => `<span class="tag">${escapeHTML(t)}</span>`).join("")}</div></div>
+                <div class="detail-section"><h3>文件信息</h3><div class="info-grid">
+                    <div class="info-box"><label>当前文件名</label><span>${escapeHTML(d.name)}</span></div>
+                    <div class="info-box"><label>原始文件名</label><span>${escapeHTML(d.originalName || "--")}</span></div>
+                    <div class="info-box" style="grid-column:1/-1;"><label>命名模板</label><span style="font-family:monospace;">${escapeHTML(d.namingTemplate || DEFAULT_TEMPLATE)}</span></div>
+                    <div class="info-box"><label>大小</label><span>${formatSize(d.size)}</span></div>
+                </div></div>
+                <div class="detail-section"><h3>OCR / 文本内容</h3><div class="ocr-text">${escapeHTML(d.text || "暂无识别文本")}</div></div>
             </div>
-            <div>
-                <div class="detail-section">
-                    <h3>事件信息</h3>
-                    <div class="info-grid">
-                        <div class="info-box"><label>事件</label><span>${escapeHTML(d.event)}</span></div>
-                        <div class="info-box"><label>分类</label><span>${escapeHTML(d.category)}</span></div>
-                        <div class="info-box"><label>时间</label><span>${escapeHTML(d.time)}</span></div>
-                        <div class="info-box"><label>地点</label><span>${escapeHTML(d.location)}</span></div>
-                        <div class="info-box" style="grid-column:1/-1;"><label>人物/单位</label><span>${escapeHTML(d.people)}</span></div>
-                    </div>
-                </div>
-                <div class="detail-section">
-                    <h3>标签</h3>
-                    <div>${(d.tags || []).map(t => `<span class="tag">${escapeHTML(t)}</span>`).join("")}</div>
-                </div>
-                <div class="detail-section">
-                    <h3>文件信息</h3>
-                    <div class="info-grid">
-                        <div class="info-box"><label>当前文件名</label><span>${escapeHTML(d.name)}</span></div>
-                        <div class="info-box"><label>原始文件名</label><span>${escapeHTML(d.originalName || "--")}</span></div>
-                        <div class="info-box"><label>命名规则</label><span>${escapeHTML(ruleLabels[d.namingRule] || "自动")}</span></div>
-                        <div class="info-box"><label>大小</label><span>${formatSize(d.size)}</span></div>
-                    </div>
-                </div>
-                <div class="detail-section">
-                    <h3>OCR / 文本内容</h3>
-                    <div class="ocr-text">${escapeHTML(d.text || "暂无识别文本")}</div>
-                </div>
-            </div>
-        </div>
-    `;
+        </div>`;
     document.getElementById("detailModal").classList.add("show");
-    // 初始化图片查看器
     setTimeout(initImageViewer, 50);
 }
-
 function closeModal(id) { document.getElementById(id).classList.remove("show"); }
-
-/* 编辑 / 删除 / 清空 */
 function editDocument(id) {
     const d = documents.find(x => x.id === id);
     if (!d) return;
@@ -879,7 +831,7 @@ async function checkBackend() {
     const dot = document.getElementById("statusDot"); const text = document.getElementById("statusText");
     try { const resp = await fetch('/api/health'); const data = await resp.json(); if (data.ok && (data.hasZhipuKey || data.hasSiliconflowKey)) { dot.style.background = "var(--success)"; text.textContent = "双平台服务已连接"; } else { dot.style.background = "#f59e0b"; text.textContent = "缺少 API Key 配置"; } } catch (e) { dot.style.background = "#ef4444"; text.textContent = "无法连接后端服务"; }
 }
-loadTheme(); updateDashboard(); renderLibrary(); renderCategories(); renderStatistics(); checkBackend();
+loadTheme(); initNamingPanel(); updateDashboard(); renderLibrary(); renderCategories(); renderStatistics(); checkBackend();
 </script>
 </body>
 </html>
