@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能文件识别与分类系统 · GLM-4.6V-Flash</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+    --primary:#2563eb;--primary-light:#eff6ff;--bg:#f5f7fb;--card:#fff;
+    --text:#172033;--sub:#64748b;--border:#e2e8f0;--danger:#ef4444;
+    --success:#10b981;--shadow:0 8px 30px rgba(15,23,42,.07);
+}
+body.dark{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--sub:#94a3b8;--border:#334155;--primary-light:#172554;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+.app{display:flex;min-height:100vh;}
+.sidebar{width:250px;background:var(--card);border-right:1px solid var(--border);padding:22px 15px;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:.3s;}
+.logo{display:flex;align-items:center;gap:12px;padding:5px 10px 25px;}
+.logo-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;}
+.logo-text{font-size:17px;font-weight:700;}
+.logo-small{font-size:11px;color:var(--sub);margin-top:3px;}
+.nav{display:flex;flex-direction:column;gap:6px;}
+.nav-item{border:0;background:transparent;width:100%;padding:12px 14px;border-radius:10px;display:flex;align-items:center;gap:12px;cursor:pointer;color:var(--sub);font-size:14px;text-align:left;transition:.2s;}
+.nav-item:hover{background:var(--bg);color:var(--text);}
+.nav-item.active{background:var(--primary-light);color:var(--primary);font-weight:600;}
+.nav-icon{width:22px;text-align:center;font-size:17px;}
+.sidebar-bottom{position:absolute;bottom:20px;left:15px;right:15px;}
+.system-status{background:var(--bg);border-radius:12px;padding:12px;font-size:12px;color:var(--sub);}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--success);margin-right:6px;}
+
+.main{margin-left:250px;width:calc(100% - 250px);min-height:100vh;}
+.topbar{height:70px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:50;}
+.page-title{font-size:20px;font-weight:700;}
+.top-actions{display:flex;align-items:center;gap:10px;}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:17px;}
+.mobile-menu{display:none;}
+.content{padding:30px;max-width:1500px;margin:auto;}
+.page{display:none;}
+.page.active{display:block;}
+
+.welcome{margin-bottom:25px;}
+.welcome h1{font-size:28px;margin-bottom:8px;}
+.welcome p{color:var(--sub);}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:25px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow);}
+.stat-top{display:flex;justify-content:space-between;align-items:center;}
+.stat-title{color:var(--sub);font-size:13px;}
+.stat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--primary-light);font-size:18px;}
+.stat-number{font-size:29px;font-weight:700;margin-top:10px;}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);}
+.card-header{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid var(--border);}
+.card-title{font-size:16px;font-weight:700;}
+.card-body{padding:22px;}
+
+.upload-zone{border:2px dashed #93c5fd;background:var(--primary-light);border-radius:18px;padding:55px 20px;text-align:center;cursor:pointer;transition:.2s;}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--primary);transform:translateY(-1px);}
+.upload-icon{font-size:48px;margin-bottom:15px;}
+.upload-zone h2{font-size:19px;margin-bottom:8px;}
+.upload-zone p{color:var(--sub);font-size:13px;}
+.upload-types{margin-top:15px;color:var(--sub);font-size:12px;}
+#fileInput{display:none;}
+.upload-buttons{margin-top:20px;display:flex;justify-content:center;gap:10px;}
+
+.btn{border:0;border-radius:9px;padding:10px 17px;cursor:pointer;font-size:13px;font-weight:600;transition:.2s;}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-secondary{background:var(--bg);color:var(--text);border:1px solid var(--border);}
+.btn-danger{background:#fee2e2;color:#dc2626;}
+
+.recent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;}
+.recent-item{border:1px solid var(--border);border-radius:12px;padding:15px;cursor:pointer;transition:.2s;}
+.recent-item:hover{border-color:#93c5fd;}
+.recent-file{display:flex;gap:12px;align-items:center;}
+.file-icon{width:42px;height:42px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.file-name{font-weight:600;font-size:13px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.file-meta{color:var(--sub);font-size:11px;margin-top:4px;}
+
+.search-box{display:flex;gap:10px;margin-bottom:20px;}
+.search-input{flex:1;border:1px solid var(--border);border-radius:10px;padding:13px 15px;background:var(--card);color:var(--text);outline:none;font-size:14px;}
+.search-input:focus{border-color:var(--primary);}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-btn{padding:7px 13px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--sub);cursor:pointer;font-size:12px;}
+.filter-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th,td{text-align:left;padding:14px 12px;border-bottom:1px solid var(--border);font-size:13px;}
+th{color:var(--sub);font-size:12px;font-weight:600;}
+tbody tr:hover{background:var(--bg);}
+.tag{display:inline-block;padding:4px 9px;border-radius:20px;background:var(--primary-light);color:var(--primary);font-size:11px;margin:2px;}
+.empty{text-align:center;color:var(--sub);padding:50px 20px;}
+
+.category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;}
+.category-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.category-card h3{font-size:15px;}
+.category-count{font-size:27px;font-weight:700;margin-top:8px;}
+.category-rule{color:var(--sub);font-size:11px;margin-top:7px;}
+
+.rule-list{display:flex;flex-direction:column;gap:12px;}
+.rule-item{border:1px solid var(--border);border-radius:12px;padding:15px;display:flex;justify-content:space-between;align-items:center;}
+.rule-info{display:flex;flex-direction:column;gap:5px;}
+.rule-name{font-weight:600;}
+.rule-keywords{color:var(--sub);font-size:12px;}
+.rule-actions{display:flex;gap:7px;}
+
+.modal-mask{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.modal-mask.show{display:flex;}
+.modal{background:var(--card);width:700px;max-width:100%;max-height:90vh;overflow:auto;border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.25);}
+.modal-header{padding:20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.modal-header h2{font-size:18px;}
+.modal-close{background:transparent;border:0;font-size:22px;cursor:pointer;color:var(--sub);}
+.modal-body{padding:20px;}
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:12px;font-weight:600;margin-bottom:7px;}
+.form-input,.form-textarea,.form-select{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;background:var(--card);color:var(--text);outline:none;}
+.form-textarea{min-height:100px;resize:vertical;}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--primary);}
+.modal-footer{padding:15px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+
+.detail-grid{display:grid;grid-template-columns:280px 1fr;gap:20px;}
+.preview{background:var(--bg);border-radius:12px;min-height:250px;display:flex;justify-content:center;align-items:center;overflow:hidden;}
+.preview img{max-width:100%;max-height:400px;}
+.detail-section{margin-bottom:20px;}
+.detail-section h3{font-size:14px;margin-bottom:10px;}
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.info-box{background:var(--bg);padding:12px;border-radius:9px;}
+.info-box label{display:block;color:var(--sub);font-size:11px;margin-bottom:5px;}
+.info-box span{font-size:13px;}
+.ocr-text{white-space:pre-wrap;background:var(--bg);border-radius:10px;padding:15px;font-size:13px;line-height:1.8;max-height:300px;overflow:auto;}
+
+.progress-box{margin-top:20px;display:none;}
+.progress-box.show{display:block;}
+.progress-text{font-size:13px;margin-bottom:7px;}
+.progress{height:8px;background:var(--border);border-radius:10px;overflow:hidden;}
+.progress-bar{height:100%;width:0;background:var(--primary);transition:.2s;}
+
+.toast{position:fixed;right:25px;bottom:25px;background:#172033;color:#fff;padding:13px 17px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transform:translateY(20px);transition:.25s;z-index:1000;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+@media(max-width:1100px){
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .category-grid{grid-template-columns:repeat(2,1fr);}
+    .recent-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:800px){
+    .sidebar{transform:translateX(-100%);}
+    .sidebar.open{transform:translateX(0);}
+    .main{margin-left:0;width:100%;}
+    .mobile-menu{display:block;}
+    .topbar{padding:0 15px;}
+    .content{padding:18px;}
+    .stats{grid-template-columns:1fr 1fr;gap:10px;}
+    .recent-grid{grid-template-columns:1fr;}
+    .category-grid{grid-template-columns:1fr 1fr;}
+    .detail-grid{grid-template-columns:1fr;}
+}
+@media(max-width:500px){
+    .stats{grid-template-columns:1fr;}
+    .category-grid{grid-template-columns:1fr;}
+    .welcome h1{font-size:23px;}
+    .upload-zone{padding:40px 15px;}
+    .info-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<aside class="sidebar" id="sidebar">
+    <div class="logo">
+        <div class="logo-icon">AI</div>
+        <div>
+            <div class="logo-text">智能资料库</div>
+            <div class="logo-small">GLM-4.6V · 文件识别</div>
+        </div>
+    </div>
+    <nav class="nav">
+        <button class="nav-item active" data-page="dashboard"><span class="nav-icon">🏠</span><span>首页</span></button>
+        <button class="nav-item" data-page="upload"><span class="nav-icon">📤</span><span>智能上传</span></button>
+        <button class="nav-item" data-page="library"><span class="nav-icon">📚</span><span>内容库</span></button>
+        <button class="nav-item" data-page="search"><span class="nav-icon">🔎</span><span>智能查询</span></button>
+        <button class="nav-item" data-page="category"><span class="nav-icon">🏷️</span><span>分类管理</span></button>
+        <button class="nav-item" data-page="statistics"><span class="nav-icon">📊</span><span>数据统计</span></button>
+    </nav>
+    <div class="sidebar-bottom">
+        <div class="system-status">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">正在检测后端服务...</span>
+        </div>
+    </div>
+</aside>
+
+<main class="main">
+    <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="icon-btn mobile-menu" id="mobileMenu">☰</button>
+            <div class="page-title" id="pageTitle">智能资料库</div>
+        </div>
+        <div class="top-actions">
+            <button class="icon-btn" id="themeBtn" title="切换主题">🌙</button>
+        </div>
+    </header>
+
+    <div class="content">
+
+<section class="page active" id="page-dashboard">
+    <div class="welcome">
+        <h1>智能文件识别中心</h1>
+        <p>上传图片，GLM-4.6V-Flash 自动识别内容、提取字段并分类。</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-top"><div class="stat-title">全部文件</div><div class="stat-icon">📁</div></div>
+            <div class="stat-number" id="statFiles">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-top"><div class="stat-title">图片文件</div><div class="stat-icon">🖼️</div></div>
+            <div class="stat-number" id="statImages">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-top"><div class="stat-title">已识别事件</div><div class="stat-icon">🧠</div></div>
+            <div class="stat-number" id="statEvents">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-top"><div class="stat-title">分类数量</div><div class="stat-icon">🏷️</div></div>
+            <div class="stat-number" id="statCategories">0</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+            <div class="card-title">快速上传</div>
+            <button class="btn btn-primary" onclick="navigate('upload')">开始识别</button>
+        </div>
+        <div class="card-body">
+            <div class="upload-zone" id="dashboardUpload">
+                <div class="upload-icon">📤</div>
+                <h2>拖拽图片到这里</h2>
+                <p>GLM-4.6V-Flash 将自动识别文字并提取结构化字段</p>
+                <div class="upload-types">支持 JPG · PNG · WEBP · BMP</div>
+                <div class="upload-buttons">
+                    <button class="btn btn-primary" onclick="event.stopPropagation();openFilePicker();">选择图片</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">最近识别</div>
+            <button class="btn btn-secondary" onclick="navigate('library')">查看全部</button>
+        </div>
+        <div class="card-body">
+            <div class="recent-grid" id="recentGrid"></div>
+        </div>
+    </div>
+</section>
+
+<section class="page" id="page-upload">
+    <div class="welcome">
+        <h1>智能上传</h1>
+        <p>图片将发送到智谱 GLM-4.6V-Flash 进行高精度识别与字段提取。</p>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="upload-zone" id="mainUpload">
+                <div class="upload-icon">📂</div>
+                <h2>点击或拖拽上传图片</h2>
+                <p>支持 JPG / PNG / WEBP / BMP</p>
+                <div class="upload-types">识别后会自动以「活动名称」重命名文件</div>
+                <div class="upload-buttons">
+                    <button class="btn btn-primary" onclick="event.stopPropagation();openFilePicker();">选择图片</button>
+                </div>
+            </div>
+            <div class="progress-box" id="progressBox">
+                <div class="progress-text" id="progressText">正在准备...</div>
+                <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" multiple accept="image/*">
+
+    <div style="height:20px;"></div>
+
+    <div class="card">
+        <div class="card-header"><div class="card-title">识别说明</div></div>
+        <div class="card-body">
+            <div style="line-height:2;color:var(--sub);font-size:13px;">
+                <p>① 图片会压缩至 1600px 宽后上传，节省流量。</p>
+                <p>② GLM-4.6V-Flash 会同时返回识别全文和结构化字段。</p>
+                <p>③ 字段包括：活动名称、时间、地点、主办单位、参与人员。</p>
+                <p>④ <b>文件将自动以「活动名称」命名</b>，原始文件名保留在详情页。</p>
+                <p>⑤ 系统根据关键词进一步分类和打标签。</p>
+                <p>⑥ ⚠️ 请勿上传身份证、银行卡等敏感文件。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="page" id="page-library">
+    <div class="welcome"><h1>内容库</h1><p>所有识别过的文件和事件都保存在这里。</p></div>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">全部资料</div>
+            <button class="btn btn-danger" onclick="clearAllData()">清空数据</button>
+        </div>
+        <div class="card-body">
+            <div class="search-box">
+                <input class="search-input" id="librarySearch" placeholder="搜索文件名、事件、地点、人物、关键词...">
+            </div>
+            <div class="filter-row" id="libraryFilters"></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr><th>文件</th><th>事件</th><th>分类</th><th>时间</th><th>地点</th><th>操作</th></tr>
+                    </thead>
+                    <tbody id="libraryTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="page" id="page-search">
+    <div class="welcome"><h1>智能查询</h1><p>输入关键词或自然语言，快速找到相关内容。</p></div>
+    <div class="card">
+        <div class="card-body">
+            <div class="search-box">
+                <input class="search-input" id="smartSearch" placeholder="例如：查询所有环保志愿活动...">
+                <button class="btn btn-primary" onclick="smartSearch()">🔎 查询</button>
+            </div>
+            <div style="color:var(--sub);font-size:12px;margin-bottom:18px;">
+                试试：“志愿活动” · “环保” · “2024年1月” · “漳州” · “社区活动”
+            </div>
+            <div id="searchResult"></div>
+        </div>
+    </div>
+</section>
+
+<section class="page" id="page-category">
+    <div class="welcome"><h1>分类管理</h1><p>根据自己的需求定义分类规则。</p></div>
+    <div class="category-grid" id="categoryGrid" style="margin-bottom:20px;"></div>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">分类规则</div>
+            <button class="btn btn-primary" onclick="openRuleModal()">＋ 新建分类</button>
+        </div>
+        <div class="card-body">
+            <div class="rule-list" id="ruleList"></div>
+        </div>
+    </div>
+</section>
+
+<section class="page" id="page-statistics">
+    <div class="welcome"><h1>数据统计</h1><p>查看资料库中的分类和事件分布。</p></div>
+    <div class="stats">
+        <div class="stat-card"><div class="stat-title">文件总数</div><div class="stat-number" id="stat2Files">0</div></div>
+        <div class="stat-card"><div class="stat-title">图片总数</div><div class="stat-number" id="stat2Images">0</div></div>
+        <div class="stat-card"><div class="stat-title">事件总数</div><div class="stat-number" id="stat2Events">0</div></div>
+        <div class="stat-card"><div class="stat-title">标签总数</div><div class="stat-number" id="stat2Tags">0</div></div>
+    </div>
+    <div class="card">
+        <div class="card-header"><div class="card-title">分类统计</div></div>
+        <div class="card-body"><div id="statisticsList"></div></div>
+    </div>
+</section>
+
+    </div>
+</main>
+</div>
+
+<div class="modal-mask" id="detailModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>资料详情</h2>
+            <button class="modal-close" onclick="closeModal('detailModal')">×</button>
+        </div>
+        <div class="modal-body" id="detailContent"></div>
+    </div>
+</div>
+
+<div class="modal-mask" id="editModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>编辑识别结果</h2>
+            <button class="modal-close" onclick="closeModal('editModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="editId">
+            <div class="form-group"><label class="form-label">文件名</label><input class="form-input" id="editName"></div>
+            <div class="form-group"><label class="form-label">事件名称</label><input class="form-input" id="editEvent"></div>
+            <div class="form-group"><label class="form-label">分类</label><select class="form-select" id="editCategory"></select></div>
+            <div class="form-group"><label class="form-label">时间</label><input class="form-input" id="editTime"></div>
+            <div class="form-group"><label class="form-label">地点</label><input class="form-input" id="editLocation"></div>
+            <div class="form-group"><label class="form-label">人物</label><input class="form-input" id="editPeople"></div>
+            <div class="form-group"><label class="form-label">标签</label><input class="form-input" id="editTags"></div>
+            <div class="form-group"><label class="form-label">识别文本</label><textarea class="form-textarea" id="editText"></textarea></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('editModal')">取消</button>
+            <button class="btn btn-primary" onclick="saveEdit()">保存</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-mask" id="ruleModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="ruleModalTitle">新建分类</h2>
+            <button class="modal-close" onclick="closeModal('ruleModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="ruleEditIndex" value="-1">
+            <div class="form-group"><label class="form-label">分类名称</label><input class="form-input" id="ruleName" placeholder="例如：志愿活动"></div>
+            <div class="form-group">
+                <label class="form-label">关键词</label>
+                <input class="form-input" id="ruleKeywords" placeholder="志愿,公益,服务,义工">
+                <div style="font-size:11px;color:var(--sub);margin-top:5px;">多个关键词使用英文逗号或中文逗号分隔。</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('ruleModal')">取消</button>
+            <button class="btn btn-primary" onclick="saveRule()">保存</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   配置
+========================================================= */
+const API_ENDPOINT = '/api/ocr';
+const STORAGE_KEY = 'smart_document_database_v2';
+
+/* =========================================================
+   默认分类规则
+========================================================= */
+const DEFAULT_RULES = [
+    { name: "志愿活动", keywords: ["志愿","志愿者","公益","义工","服务","志愿服务"] },
+    { name: "环保活动", keywords: ["环保","垃圾","清洁","绿化","植树","环境保护"] },
+    { name: "会议", keywords: ["会议","开会","座谈","研讨","讨论","汇报"] },
+    { name: "学习培训", keywords: ["学习","培训","课程","讲座","考试","课堂"] },
+    { name: "体育活动", keywords: ["运动","体育","篮球","足球","跑步","比赛"] },
+    { name: "文艺活动", keywords: ["文艺","演出","唱歌","舞蹈","音乐","晚会"] },
+    { name: "公益活动", keywords: ["公益","爱心","捐赠","帮助","关怀"] },
+    { name: "其他", keywords: [] }
+];
+
+let rules = loadRules();
+let documents = loadDocuments();
+let currentFilter = "全部";
+
+/* =========================================================
+   存储
+========================================================= */
+function loadRules() {
+    try {
+        const data = localStorage.getItem("smart_rules");
+        if (data) return JSON.parse(data);
+    } catch(e) {}
+    return DEFAULT_RULES;
+}
+function saveRules() {
+    localStorage.setItem("smart_rules", JSON.stringify(rules));
+}
+function loadDocuments() {
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) return JSON.parse(data);
+    } catch(e) {}
+    return [];
+}
+function saveDocuments() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(documents));
+    } catch(e) {
+        showToast("浏览器存储空间不足，建议不要保存过大的图片");
+    }
+}
+
+/* =========================================================
+   导航
+========================================================= */
+const pageTitles = {
+    dashboard: "智能资料库",
+    upload: "智能上传",
+    library: "内容库",
+    search: "智能查询",
+    category: "分类管理",
+    statistics: "数据统计"
+};
+
+function navigate(page) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    const target = document.getElementById("page-" + page);
+    if (target) target.classList.add("active");
+    document.querySelectorAll(".nav-item").forEach(item => {
+        item.classList.toggle("active", item.dataset.page === page);
+    });
+    document.getElementById("pageTitle").textContent = pageTitles[page] || "智能资料库";
+    document.getElementById("sidebar").classList.remove("open");
+    refreshPage(page);
+}
+
+document.querySelectorAll(".nav-item").forEach(item => {
+    item.addEventListener("click", () => navigate(item.dataset.page));
+});
+
+document.getElementById("mobileMenu").addEventListener("click", () => {
+    document.getElementById("sidebar").classList.toggle("open");
+});
+
+function refreshPage(page) {
+    if (page === "dashboard") updateDashboard();
+    if (page === "library") renderLibrary();
+    if (page === "category") renderCategories();
+    if (page === "statistics") renderStatistics();
+}
+
+/* =========================================================
+   文件上传
+========================================================= */
+const fileInput = document.getElementById("fileInput");
+
+function openFilePicker() {
+    fileInput.value = "";
+    fileInput.click();
+}
+
+fileInput.addEventListener("change", e => handleFiles(e.target.files));
+
+function setupDropZone(element) {
+    if (!element) return;
+    element.addEventListener("click", () => openFilePicker());
+    element.addEventListener("dragover", e => {
+        e.preventDefault();
+        element.classList.add("dragover");
+    });
+    element.addEventListener("dragleave", () => element.classList.remove("dragover"));
+    element.addEventListener("drop", e => {
+        e.preventDefault();
+        element.classList.remove("dragover");
+        handleFiles(e.dataTransfer.files);
+    });
+}
+
+setupDropZone(document.getElementById("dashboardUpload"));
+setupDropZone(document.getElementById("mainUpload"));
+
+/* =========================================================
+   处理文件
+========================================================= */
+async function handleFiles(fileList) {
+    if (!fileList || fileList.length === 0) return;
+    navigate("upload");
+
+    const files = Array.from(fileList).filter(f => f.type.startsWith("image/"));
+    if (files.length === 0) {
+        showToast("请上传图片文件");
+        return;
+    }
+
+    for (let i = 0; i < files.length; i++) {
+        await processFile(files[i], i, files.length);
+    }
+
+    updateDashboard();
+    renderLibrary();
+    showToast("全部文件处理完成");
+}
+
+async function processFile(file, index, total) {
+    const progressBox = document.getElementById("progressBox");
+    const progressText = document.getElementById("progressText");
+    const progressBar = document.getElementById("progressBar");
+
+    progressBox.classList.add("show");
+    progressText.textContent = `正在处理 ${index+1}/${total}：${file.name}`;
+    progressBar.style.width = ((index)/total*100) + "%";
+
+    try {
+        progressText.textContent = `正在压缩图片 (${index+1}/${total})...`;
+        const base64 = await compressToBase64(file, 1600, 0.85);
+        progressBar.style.width = ((index + 0.3)/total*100) + "%";
+
+        progressText.textContent = `正在调用 GLM-4.6V-Flash 识别 (${index+1}/${total})...`;
+        const resp = await fetch(API_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imageBase64: base64, mode: 'structured' })
+        });
+
+        if (!resp.ok) {
+            const errData = await resp.json().catch(() => ({}));
+            throw new Error(errData.error || `HTTP ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        progressBar.style.width = ((index + 0.8)/total*100) + "%";
+
+        const parsed = parseGLMResponse(data.text);
+        const analysis = analyzeContent(parsed.全文 || data.text, file.name);
+
+        // ============ 智能命名：以「活动名称」为文件名 ============
+        const rawName = (parsed.活动名称 || analysis.event || file.name).trim();
+        // 过滤不合法字符
+        const safeName = rawName
+            .replace(/[\\/:*?"<>|]/g, '_')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .substring(0, 60) || '未命名';
+        // 保留原扩展名
+        const ext = (file.name.match(/\.[^/.]+$/) || ['.jpg'])[0];
+        const finalName = safeName + ext;
+
+        const record = {
+            id: Date.now().toString() + Math.random().toString(36).substring(2),
+            name: finalName,              // 显示名：自动以活动名称命名
+            originalName: file.name,      // 原始文件名，保留追溯
+            type: file.type || "unknown",
+            size: file.size,
+            createdAt: new Date().toISOString(),
+            text: parsed.全文 || data.text,
+            event: parsed.活动名称 || analysis.event,
+            category: analysis.category,
+            time: parsed.时间 || analysis.time,
+            location: parsed.地点 || analysis.location,
+            people: cleanPeople(parsed.参与人员 || parsed.主办单位 || analysis.people),
+            tags: analysis.tags,
+            imageData: null
+        };
+
+        record.imageData = await compressToBase64(file, 800, 0.7);
+
+        documents.unshift(record);
+        saveDocuments();
+
+        progressBar.style.width = "100%";
+        progressText.textContent = `✓ 已识别并命名为：${finalName}`;
+        await sleep(500);
+
+    } catch (error) {
+        console.error(error);
+        progressText.textContent = `处理失败：${file.name} - ${error.message}`;
+        showToast(`处理失败：${error.message}`);
+    }
+}
+
+/* =========================================================
+   修复版 JSON 解析：兼容 ```json 包裹、前后有解释文字等情况
+========================================================= */
+function parseGLMResponse(raw) {
+    if (!raw) return { 全文: "" };
+
+    let text = String(raw).trim();
+
+    // 1. 优先尝试提取 ```json ... ``` 代码块
+    const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (codeBlockMatch) {
+        text = codeBlockMatch[1].trim();
+    }
+
+    // 2. 尝试直接解析整段
+    const tryParse = (str) => {
+        try { return JSON.parse(str); } catch (e) { return null; }
+    };
+
+    let obj = tryParse(text);
+
+    // 3. 如果直接解析失败，尝试从第一个 { 到最后一个 } 截取
+    if (!obj) {
+        const start = text.indexOf('{');
+        const end = text.lastIndexOf('}');
+        if (start !== -1 && end > start) {
+            obj = tryParse(text.substring(start, end + 1));
+        }
+    }
+
+    // 4. 解析成功则返回结构化字段
+    if (obj && typeof obj === 'object') {
+        return {
+            活动名称: obj.活动名称 || obj["活动名称"] || obj.event || "",
+            时间: obj.时间 || obj.time || "",
+            地点: obj.地点 || obj.location || "",
+            主办单位: obj.主办单位 || obj.organization || "",
+            参与人员: obj.参与人员 || obj.people || obj.参与人 || "",
+            全文: obj.全文 || obj["完整内容"] || obj.text || raw
+        };
+    }
+
+    // 5. 全部失败，返回原文
+    return { 全文: raw };
+}
+
+/* =========================================================
+   人物字段清洗：去掉冗长的描述，只留核心人名/单位
+========================================================= */
+function cleanPeople(rawText) {
+    if (!rawText || rawText === "--") return "--";
+
+    // 优先匹配"姓名：xxx"
+    const nameMatch = rawText.match(/姓\s*名[：:]\s*([^\s，。,\n]{2,10})/);
+    if (nameMatch) return nameMatch[1];
+
+    // 优先匹配"负责人：xxx"
+    const leaderMatch = rawText.match(/负责人[：:]\s*([^\s，。,\n]{2,15})/);
+    if (leaderMatch) return leaderMatch[1];
+
+    // 否则截取合理长度
+    const cleaned = rawText.replace(/\s+/g, ' ').trim();
+    return cleaned.length > 80 ? cleaned.substring(0, 80) + '…' : cleaned;
+}
+
+function compressToBase64(file, maxWidth, quality) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                let w = img.width, h = img.height;
+                if (w > maxWidth) {
+                    h = h * maxWidth / w;
+                    w = maxWidth;
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                resolve(dataUrl.split(',')[1]);
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+/* =========================================================
+   内容分析（本地兜底）
+========================================================= */
+function analyzeContent(text, fileName) {
+    const content = `${fileName}\n${text || ""}`;
+    const lower = content.toLowerCase();
+
+    let category = "其他";
+    let bestScore = 0;
+    for (const rule of rules) {
+        let score = 0;
+        for (const keyword of rule.keywords) {
+            if (lower.includes(keyword.toLowerCase())) score++;
+        }
+        if (score > bestScore) {
+            bestScore = score;
+            category = rule.name;
+        }
+    }
+
+    return {
+        category,
+        event: guessEvent(text, fileName, category),
+        time: extractTime(text),
+        location: extractLocation(text),
+        people: extractPeople(text),
+        tags: extractTags(content, category)
+    };
+}
+
+function guessEvent(text, fileName, category) {
+    const t = (text || "").replace(/\s+/g, " ").trim();
+    if (!t) return fileName.replace(/\.[^/.]+$/, "").substring(0, 40);
+
+    const fieldPatterns = [
+        /活动名称[：:""\s]+([^\n""]{2,60})/,
+        /活动主题[：:""\s]+([^\n""]{2,60})/,
+        /项目名称[：:""\s]+([^\n""]{2,60})/,
+        /主题[：:""\s]+([^\n""]{2,60})/,
+        /名称[：:""\s]+([^\n""]{2,60})/
+    ];
+    for (const p of fieldPatterns) {
+        const m = t.match(p);
+        if (m && m[1]) {
+            let name = m[1].replace(/^["""\s]+|["""\s]+$/g, "").replace(/\s+/g, "").trim();
+            if (name.length >= 4 && /[\u4e00-\u9fa5]/.test(name)) {
+                return name.substring(0, 60);
+            }
+        }
+    }
+
+    const lines = t.split(/[。！？\n]/).map(s => s.trim()).filter(Boolean);
+    for (const line of lines.slice(0, 5)) {
+        if (/报备表|申请表|登记表|统计表|日期|时间|地点|单位|学院|学校/.test(line)) continue;
+        if (line.length >= 6 && line.length <= 50 && /活动|服务|志愿|项目|主题|比赛|培训|会议/.test(line)) {
+            return line.substring(0, 60);
+        }
+    }
+
+    const eventKeywords = ["志愿活动","志愿服务","公益活动","环保活动","社区活动","垃圾清理","植树活动","会议","培训","讲座","比赛","运动会","篮球比赛","足球比赛","文艺演出","晚会"];
+    for (const k of eventKeywords) {
+        if (t.includes(k)) return k;
+    }
+
+    if (category && category !== "其他") return category;
+    return fileName.replace(/\.[^/.]+$/, "").substring(0, 40);
+}
+
+function extractTime(text) {
+    if (!text) return "--";
+    const patterns = [
+        /\d{4}年\d{1,2}月\d{1,2}日/g,
+        /\d{4}[-\/]\d{1,2}[-\/]\d{1,2}/g,
+        /\d{1,2}月\d{1,2}日/g,
+        /\d{4}年\d{1,2}月/g,
+        /星期[一二三四五六日天]/g,
+        /周[一二三四五六日]/g
+    ];
+    for (const p of patterns) {
+        const r = text.match(p);
+        if (r && r.length) return r[0];
+    }
+    return "--";
+}
+
+function extractLocation(text) {
+    if (!text) return "--";
+    const patterns = [
+        /地点[：:]\s*([^\n，。,；;]+)/,
+        /地址[：:]\s*([^\n，。,；;]+)/,
+        /活动地点[：:]\s*([^\n，。,；;]+)/,
+        /在([^，。；;\n]{2,30})(?:举行|开展|进行)/
+    ];
+    for (const p of patterns) {
+        const m = text.match(p);
+        if (m) return (m[1] || m[0]).trim();
+    }
+    return "--";
+}
+
+function extractPeople(text) {
+    if (!text) return "--";
+    const patterns = [
+        /姓名[：:]\s*([^\n]+)/,
+        /负责人[：:]\s*([^\n]+)/,
+        /参与人员[：:]\s*([^\n]+)/,
+        /参加人员[：:]\s*([^\n]+)/
+    ];
+    for (const p of patterns) {
+        const m = text.match(p);
+        if (m) return m[1].trim().substring(0, 80);
+    }
+    return "--";
+}
+
+function extractTags(content, category) {
+    const common = ["志愿","公益","环保","社区","活动","会议","学习","培训","体育","比赛","文艺","服务","清洁","垃圾","植树","讲座"];
+    const tags = [];
+    for (const k of common) {
+        if (content.includes(k)) tags.push(k);
+    }
+    if (category && category !== "其他") tags.unshift(category);
+    return [...new Set(tags)].slice(0, 8);
+}
+
+/* =========================================================
+   仪表盘
+========================================================= */
+function updateDashboard() {
+    const images = documents.filter(d => d.type.startsWith("image/")).length;
+    const events = documents.filter(d => d.event).length;
+    const categories = new Set(documents.map(d => d.category)).size;
+
+    document.getElementById("statFiles").textContent = documents.length;
+    document.getElementById("statImages").textContent = images;
+    document.getElementById("statEvents").textContent = events;
+    document.getElementById("statCategories").textContent = categories;
+
+    renderRecent();
+}
+
+function renderRecent() {
+    const container = document.getElementById("recentGrid");
+    const list = documents.slice(0, 6);
+
+    if (!list.length) {
+        container.innerHTML = `<div class="empty" style="grid-column:1/-1;">暂时还没有资料，先上传一张图片试试。</div>`;
+        return;
+    }
+
+    container.innerHTML = list.map(d => `
+        <div class="recent-item" onclick="showDetail('${d.id}')">
+            <div class="recent-file">
+                <div class="file-icon">${getFileIcon(d)}</div>
+                <div style="min-width:0;">
+                    <div class="file-name">${escapeHTML(d.name)}</div>
+                    <div class="file-meta">${escapeHTML(d.category)} · ${formatDate(d.createdAt)}</div>
+                </div>
+            </div>
+        </div>
+    `).join("");
+}
+
+/* =========================================================
+   内容库
+========================================================= */
+function renderLibrary() {
+    const query = (document.getElementById("librarySearch")?.value || "").trim().toLowerCase();
+
+    let list = documents.filter(d => {
+        const searchable = [d.name, d.originalName, d.event, d.category, d.time, d.location, d.people, d.text, ...(d.tags || [])].join(" ").toLowerCase();
+        const matchesSearch = !query || searchable.includes(query);
+        const matchesFilter = currentFilter === "全部" || d.category === currentFilter;
+        return matchesSearch && matchesFilter;
+    });
+
+    renderLibraryFilters();
+    const tbody = document.getElementById("libraryTable");
+
+    if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty">没有找到相关资料</div></td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = list.map(d => `
+        <tr>
+            <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div class="file-icon" style="width:35px;height:35px;">${getFileIcon(d)}</div>
+                    <div style="min-width:130px;">
+                        <div style="font-weight:600;">${escapeHTML(d.name)}</div>
+                        <div style="color:var(--sub);font-size:10px;">${formatSize(d.size)}</div>
+                    </div>
+                </div>
+            </td>
+            <td>${escapeHTML(d.event || "--")}</td>
+            <td><span class="tag">${escapeHTML(d.category)}</span></td>
+            <td>${escapeHTML(d.time || "--")}</td>
+            <td>${escapeHTML(d.location || "--")}</td>
+            <td>
+                <div style="display:flex;gap:5px;">
+                    <button class="btn btn-secondary" onclick="showDetail('${d.id}')">查看</button>
+                    <button class="btn btn-secondary" onclick="editDocument('${d.id}')">编辑</button>
+                    <button class="btn btn-danger" onclick="deleteDocument('${d.id}')">删除</button>
+                </div>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function renderLibraryFilters() {
+    const container = document.getElementById("libraryFilters");
+    const categories = ["全部", ...new Set(documents.map(d => d.category))];
+    container.innerHTML = categories.map(c => `
+        <button class="filter-btn ${currentFilter === c ? "active" : ""}" onclick="setFilter('${escapeAttr(c)}')">${escapeHTML(c)}</button>
+    `).join("");
+}
+
+function setFilter(filter) {
+    currentFilter = filter;
+    renderLibrary();
+}
+
+/* =========================================================
+   智能搜索
+========================================================= */
+function smartSearch() {
+    const query = document.getElementById("smartSearch").value.trim().toLowerCase();
+    if (!query) { showToast("请输入查询内容"); return; }
+
+    const cleaned = query.replace(/查询|查找|搜索|所有|全部|资料|记录|信息/g, " ").trim();
+    const keywords = cleaned.split(/\s+|，|,|、/).filter(Boolean);
+
+    const result = documents.filter(d => {
+        const text = [d.name, d.originalName, d.event, d.category, d.time, d.location, d.people, d.text, ...(d.tags || [])].join(" ").toLowerCase();
+        if (!keywords.length) return text.includes(query);
+        return keywords.some(k => text.includes(k));
+    });
+
+    renderSearchResults(result, query);
+}
+
+function renderSearchResults(result, query) {
+    const container = document.getElementById("searchResult");
+    if (!result.length) {
+        container.innerHTML = `<div class="empty">没有找到与 <b>${escapeHTML(query)}</b> 相关的内容。</div>`;
+        return;
+    }
+    container.innerHTML = `
+        <div style="margin-bottom:15px;color:var(--sub);font-size:13px;">
+            找到 <b style="color:var(--primary);">${result.length}</b> 条相关记录
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>文件</th><th>事件</th><th>分类</th><th>时间</th><th>地点</th><th>操作</th></tr></thead>
+                <tbody>
+                ${result.map(d => `
+                    <tr>
+                        <td>${escapeHTML(d.name)}</td>
+                        <td>${escapeHTML(d.event)}</td>
+                        <td><span class="tag">${escapeHTML(d.category)}</span></td>
+                        <td>${escapeHTML(d.time)}</td>
+                        <td>${escapeHTML(d.location)}</td>
+                        <td><button class="btn btn-secondary" onclick="showDetail('${d.id}')">查看</button></td>
+                    </tr>
+                `).join("")}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+/* =========================================================
+   详情
+========================================================= */
+function showDetail(id) {
+    const d = documents.find(x => x.id === id);
+    if (!d) return;
+
+    const content = document.getElementById("detailContent");
+    const preview = d.imageData
+        ? `<img src="data:image/jpeg;base64,${d.imageData}" alt="预览">`
+        : `<div style="color:var(--sub);text-align:center;padding:40px;">${getFileIcon(d)}<br><br>暂无图片预览</div>`;
+
+    content.innerHTML = `
+        <div class="detail-grid">
+            <div>
+                <div class="preview">${preview}</div>
+                <div style="margin-top:10px;text-align:center;">
+                    <button class="btn btn-secondary" onclick="editDocument('${d.id}')">编辑识别结果</button>
+                </div>
+            </div>
+            <div>
+                <div class="detail-section">
+                    <h3>事件信息</h3>
+                    <div class="info-grid">
+                        <div class="info-box"><label>事件</label><span>${escapeHTML(d.event)}</span></div>
+                        <div class="info-box"><label>分类</label><span>${escapeHTML(d.category)}</span></div>
+                        <div class="info-box"><label>时间</label><span>${escapeHTML(d.time)}</span></div>
+                        <div class="info-box"><label>地点</label><span>${escapeHTML(d.location)}</span></div>
+                        <div class="info-box" style="grid-column:1/-1;"><label>人物/单位</label><span>${escapeHTML(d.people)}</span></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h3>标签</h3>
+                    <div>${(d.tags || []).map(t => `<span class="tag">${escapeHTML(t)}</span>`).join("")}</div>
+                </div>
+                <div class="detail-section">
+                    <h3>文件信息</h3>
+                    <div class="info-grid">
+                        <div class="info-box"><label>文件名（自动命名）</label><span>${escapeHTML(d.name)}</span></div>
+                        <div class="info-box"><label>原始文件名</label><span>${escapeHTML(d.originalName || "--")}</span></div>
+                        <div class="info-box"><label>大小</label><span>${formatSize(d.size)}</span></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h3>OCR / 文本内容</h3>
+                    <div class="ocr-text">${escapeHTML(d.text || "暂无识别文本")}</div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById("detailModal").classList.add("show");
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove("show");
+}
+
+/* =========================================================
+   编辑
+========================================================= */
+function editDocument(id) {
+    const d = documents.find(x => x.id === id);
+    if (!d) return;
+
+    document.getElementById("editId").value = d.id;
+    document.getElementById("editName").value = d.name || "";
+    document.getElementById("editEvent").value = d.event || "";
+    document.getElementById("editTime").value = d.time || "";
+    document.getElementById("editLocation").value = d.location || "";
+    document.getElementById("editPeople").value = d.people || "";
+    document.getElementById("editTags").value = (d.tags || []).join(",");
+    document.getElementById("editText").value = d.text || "";
+
+    const select = document.getElementById("editCategory");
+    select.innerHTML = rules.map(r => `<option value="${escapeAttr(r.name)}">${escapeHTML(r.name)}</option>`).join("");
+    select.value = d.category;
+
+    document.getElementById("editModal").classList.add("show");
+}
+
+function saveEdit() {
+    const id = document.getElementById("editId").value;
+    const d = documents.find(x => x.id === id);
+    if (!d) return;
+
+    d.name = document.getElementById("editName").value.trim() || d.name;
+    d.event = document.getElementById("editEvent").value.trim();
+    d.category = document.getElementById("editCategory").value;
+    d.time = document.getElementById("editTime").value.trim();
+    d.location = document.getElementById("editLocation").value.trim();
+    d.people = document.getElementById("editPeople").value.trim();
+    d.tags = document.getElementById("editTags").value.split(/[,，、]/).map(x => x.trim()).filter(Boolean);
+    d.text = document.getElementById("editText").value;
+
+    saveDocuments();
+    closeModal("editModal");
+    closeModal("detailModal");
+    renderLibrary();
+    updateDashboard();
+    showToast("保存成功");
+}
+
+/* =========================================================
+   删除
+========================================================= */
+function deleteDocument(id) {
+    const d = documents.find(x => x.id === id);
+    if (!d) return;
+    if (!confirm(`确定删除“${d.name}”吗？`)) return;
+
+    documents = documents.filter(x => x.id !== id);
+    saveDocuments();
+    renderLibrary();
+    updateDashboard();
+    showToast("已删除");
+}
+
+function clearAllData() {
+    if (!documents.length) { showToast("当前没有数据"); return; }
+    if (!confirm("确定清空全部资料吗？此操作不可恢复。")) return;
+    documents = [];
+    saveDocuments();
+    renderLibrary();
+    updateDashboard();
+    showToast("资料库已清空");
+}
+
+/* =========================================================
+   分类
+========================================================= */
+function renderCategories() {
+    const grid = document.getElementById("categoryGrid");
+    const counts = {};
+    rules.forEach(r => {
+        counts[r.name] = documents.filter(d => d.category === r.name).length;
+    });
+
+    grid.innerHTML = rules.map(r => `
+        <div class="category-card">
+            <div style="font-size:25px;margin-bottom:8px;">${getCategoryIcon(r.name)}</div>
+            <h3>${escapeHTML(r.name)}</h3>
+            <div class="category-count">${counts[r.name] || 0}</div>
+            <div class="category-rule">${r.keywords.length ? escapeHTML(r.keywords.join("、")) : "未设置关键词"}</div>
+        </div>
+    `).join("");
+
+    const ruleList = document.getElementById("ruleList");
+    ruleList.innerHTML = rules.map((r, index) => `
+        <div class="rule-item">
+            <div class="rule-info">
+                <div class="rule-name">${getCategoryIcon(r.name)} ${escapeHTML(r.name)}</div>
+                <div class="rule-keywords">${r.keywords.length ? "关键词：" + escapeHTML(r.keywords.join("、")) : "没有关键词"}</div>
+            </div>
+            <div class="rule-actions">
+                <button class="btn btn-secondary" onclick="editRule(${index})">编辑</button>
+                ${r.name !== "其他" ? `<button class="btn btn-danger" onclick="deleteRule(${index})">删除</button>` : ""}
+            </div>
+        </div>
+    `).join("");
+}
+
+function openRuleModal() {
+    document.getElementById("ruleEditIndex").value = "-1";
+    document.getElementById("ruleName").value = "";
+    document.getElementById("ruleKeywords").value = "";
+    document.getElementById("ruleModalTitle").textContent = "新建分类";
+    document.getElementById("ruleModal").classList.add("show");
+}
+
+function editRule(index) {
+    const r = rules[index];
+    if (!r) return;
+    document.getElementById("ruleEditIndex").value = index;
+    document.getElementById("ruleName").value = r.name;
+    document.getElementById("ruleKeywords").value = r.keywords.join(",");
+    document.getElementById("ruleModalTitle").textContent = "编辑分类";
+    document.getElementById("ruleModal").classList.add("show");
+}
+
+function saveRule() {
+    const name = document.getElementById("ruleName").value.trim();
+    const keywords = document.getElementById("ruleKeywords").value.split(/[,，、]/).map(x => x.trim()).filter(Boolean);
+    if (!name) { showToast("请输入分类名称"); return; }
+
+    const editIndex = Number(document.getElementById("ruleEditIndex").value);
+    const rule = { name, keywords: [...new Set(keywords)] };
+
+    if (editIndex >= 0) rules[editIndex] = rule;
+    else rules.push(rule);
+
+    saveRules();
+    closeModal("ruleModal");
+    renderCategories();
+    showToast("分类规则已保存");
+}
+
+function deleteRule(index) {
+    const r = rules[index];
+    if (!r) return;
+    if (!confirm(`确定删除“${r.name}”分类吗？`)) return;
+    rules.splice(index, 1);
+    saveRules();
+    renderCategories();
+    showToast("分类已删除");
+}
+
+/* =========================================================
+   统计
+========================================================= */
+function renderStatistics() {
+    const images = documents.filter(d => d.type.startsWith("image/")).length;
+    const tags = new Set(documents.flatMap(d => d.tags || [])).size;
+
+    document.getElementById("stat2Files").textContent = documents.length;
+    document.getElementById("stat2Images").textContent = images;
+    document.getElementById("stat2Events").textContent = documents.filter(d => d.event).length;
+    document.getElementById("stat2Tags").textContent = tags;
+
+    const container = document.getElementById("statisticsList");
+    if (!documents.length) {
+        container.innerHTML = `<div class="empty">暂无统计数据</div>`;
+        return;
+    }
+
+    const count = {};
+    documents.forEach(d => { count[d.category] = (count[d.category] || 0) + 1; });
+    const total = documents.length;
+
+    container.innerHTML = Object.entries(count).sort((a, b) => b[1] - a[1]).map(([name, num]) => {
+        const percent = Math.round(num / total * 100);
+        return `
+            <div style="margin-bottom:18px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:7px;font-size:13px;">
+                    <span>${getCategoryIcon(name)} ${escapeHTML(name)}</span>
+                    <span>${num} / ${percent}%</span>
+                </div>
+                <div style="height:8px;background:var(--border);border-radius:20px;overflow:hidden;">
+                    <div style="width:${percent}%;height:100%;background:var(--primary);border-radius:20px;"></div>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+/* =========================================================
+   事件绑定
+========================================================= */
+document.getElementById("smartSearch").addEventListener("keydown", e => {
+    if (e.key === "Enter") smartSearch();
+});
+
+document.getElementById("librarySearch").addEventListener("input", () => renderLibrary());
+
+document.getElementById("themeBtn").addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    const dark = document.body.classList.contains("dark");
+    localStorage.setItem("smart_dark_mode", dark);
+    document.getElementById("themeBtn").textContent = dark ? "☀️" : "🌙";
+});
+
+function loadTheme() {
+    const dark = localStorage.getItem("smart_dark_mode") === "true";
+    if (dark) {
+        document.body.classList.add("dark");
+        document.getElementById("themeBtn").textContent = "☀️";
+    }
+}
+
+/* =========================================================
+   工具函数
+========================================================= */
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+function formatSize(bytes) {
+    if (!bytes) return "0 B";
+    const units = ["B", "KB", "MB", "GB"];
+    let i = 0, size = bytes;
+    while (size >= 1024 && i < units.length - 1) { size /= 1024; i++; }
+    return size.toFixed(i === 0 ? 0 : 1) + " " + units[i];
+}
+
+function formatDate(date) {
+    if (!date) return "--";
+    const d = new Date(date);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+
+function getFileIcon(d) {
+    if (d.type && d.type.startsWith("image/")) return "🖼️";
+    return "📄";
+}
+
+function getCategoryIcon(name) {
+    const map = {
+        "志愿活动": "🤝", "环保活动": "🌱", "会议": "💼", "学习培训": "📚",
+        "体育活动": "🏃", "文艺活动": "🎭", "公益活动": "❤️", "其他": "📁"
+    };
+    return map[name] || "🏷️";
+}
+
+function escapeHTML(value) {
+    if (value === null || value === undefined) return "";
+    return String(value)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function escapeAttr(value) { return escapeHTML(value); }
+
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2500);
+}
+
+/* =========================================================
+   检测后端
+========================================================= */
+async function checkBackend() {
+    const dot = document.getElementById("statusDot");
+    const text = document.getElementById("statusText");
+    try {
+        const resp = await fetch('/api/health');
+        const data = await resp.json();
+        if (data.ok && data.hasKey) {
+            dot.style.background = "var(--success)";
+            text.textContent = "GLM-4.6V 服务已连接";
+        } else if (data.ok && !data.hasKey) {
+            dot.style.background = "#f59e0b";
+            text.textContent = "缺少 ZHIPU_API_KEY 环境变量";
+        } else {
+            throw new Error("bad response");
+        }
+    } catch (e) {
+        dot.style.background = "#ef4444";
+        text.textContent = "无法连接后端服务";
+    }
+}
+
+/* =========================================================
+   初始化
+========================================================= */
+loadTheme();
+updateDashboard();
+renderLibrary();
+renderCategories();
+renderStatistics();
+checkBackend();
+</script>
+
+</body>
+</html>
